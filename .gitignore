@@ -1,0 +1,9 @@
+.env
+*.log
+.DS_Store
+Thumbs.db
+.archify/
+__pycache__/
+*.py[cod]
+~$*
+

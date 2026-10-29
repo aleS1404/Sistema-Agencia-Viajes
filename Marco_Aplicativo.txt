@@ -1,0 +1,17 @@
+CAPITULO III: MARCO APLICATIVO 
+Prodcuto backlog
+	 Lista de necesidades y requesimientos funcionales, casos de uso documentado
+Roles scrum 
+	Scrum master 
+	Product owner
+	Developers 
+Sprint planing: todos los sprints
+Objetivo del sprint(por que), el o los elementos del producto backlog seleccionados para el sprint, plan de acción para entregar el increment 
+Sprint 
+	Definiciones de acciones, roles(casos de uso documentado general)
+Para los modelos usar:
+-	Modelo comceptual UML: Diagrama de clases, clases, atri butos, metodods relaciones
+-	Modelo de navegación(UML), diagrama de navegación
+-	Modelo de presentacon(UML), diagramas de presentación, diagramas, formularios, menus, lista, botones, etc 
+-	Modelo de procesos(UML): Diagrama de actividades
+-	Diseño de implementación: diseñi de base de datos: modelo ER, modelo relacional, tablas etc 
