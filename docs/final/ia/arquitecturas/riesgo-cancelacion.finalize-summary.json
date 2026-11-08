@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\.archify\\architecture-riesgo-cancelacion-20261108-1252\\candidate.json",
+    "sha256": "a626c5e01c2aaf50de86f6ca1b8b79e110e5f88ed7b5b44247f27f3c25bb4b49",
+    "bytes": 4576
+  },
+  "artifact": {
+    "path": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\riesgo-cancelacion.html",
+    "sha256": "a92f1638cbedfa0d340fc775437436c151dc839af3d86dfd68aa757221a23b5e",
+    "bytes": 848643
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\riesgo-cancelacion.finalize.json",
+    "summaryReceipt": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\riesgo-cancelacion.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\riesgo-cancelacion.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-08T04:55:30.296Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 4190,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "routesOverSuggestedBends": 2
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [],
+      "detours": [
+        {
+          "relationship": {
+            "from": "features",
+            "to": "rules",
+            "label": "variables observadas",
+            "collectionIndex": 5,
+            "artifactIndex": 6
+          },
+          "bends": 3,
+          "stretch": 1.295
+        },
+        {
+          "relationship": {
+            "from": "rules",
+            "to": "score",
+            "label": "suma limitada",
+            "collectionIndex": 6,
+            "artifactIndex": 7
+          },
+          "bends": 3,
+          "stretch": 1.268
+        }
+      ],
+      "truncated": false
+    },
+    "hints": [
+      "features → rules needs 3 bends: move node features or rules so they share a row or column with matching centers, or sit diagonally with a clear corner.",
+      "rules → score needs 3 bends: move node rules or score so they share a row or column with matching centers, or sit diagonally with a clear corner."
+    ],
+    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
+  }
+}

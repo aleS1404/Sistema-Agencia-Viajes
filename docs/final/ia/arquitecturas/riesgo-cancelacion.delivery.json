@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "6bf7b319-3a0d-40f6-8117-2ed83fab5482",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\.archify\\architecture-riesgo-cancelacion-20261108-1252\\candidate.json",
+  "output": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\riesgo-cancelacion.html",
+  "specification": {
+    "sha256": "a626c5e01c2aaf50de86f6ca1b8b79e110e5f88ed7b5b44247f27f3c25bb4b49",
+    "bytes": 4576
+  },
+  "artifact": {
+    "sha256": "a92f1638cbedfa0d340fc775437436c151dc839af3d86dfd68aa757221a23b5e",
+    "bytes": 848643
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "dacb0569-4fd8-462b-b840-b30cdad09b1f",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\.archify\\architecture-chatbot-administrativo-20261108-1252\\candidate.json",
+  "output": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\chatbot-administrativo.html",
+  "specification": {
+    "sha256": "eb371742a1cf3c18226f11ecd493a2e4570da9882a59729f3f470b3d5b786d69",
+    "bytes": 4565
+  },
+  "artifact": {
+    "sha256": "0ee8745e37b1b028d6fd3689c0f4ddc7dd6755401888939f26526cce8d627291",
+    "bytes": 848899
+  }
+}

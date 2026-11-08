@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AndesGo — Asistente administrativo",
+    "subtitle": "Sprint 5 · Intenciones auditables y datos vivos del sistema",
+    "locale": "es",
+    "output": "docs/final/ia/arquitecturas/chatbot-administrativo.html",
+    "animation": "trace",
+    "visual_preset": "editorial",
+    "quality_profile": "showcase",
+    "repository": { "url": "https://github.com/aleS1404/Sistema-Agencia-Viajes.git", "provider": "github", "link_mode": "web", "revision": "04fae33a688d1bcad03597d2d3680f70b3211399" },
+    "views": [
+      { "id": "pregunta", "label": "Pregunta y respuesta", "focus": ["admin", "chat-ui", "assistant-api", "intent", "answer"], "note": "La respuesta incluye intención, texto y acciones internas." },
+      { "id": "datos", "label": "Fuentes de datos", "focus": ["intent", "live-services", "mysql"], "note": "Solo consultas predefinidas; no se ejecuta SQL del usuario." }
+    ]
+  },
+  "components": [
+    { "id": "admin", "type": "external", "label": "Administrador", "sublabel": "Pregunta en español", "pos": [40, 280], "size": [145, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 468, "end_line": 474, "label": "Asistente UI" }] },
+    { "id": "chat-ui", "type": "frontend", "label": "Chat React", "sublabel": "Mensajes y sugerencias", "pos": [240, 280], "size": [155, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 468, "end_line": 474, "label": "AdminAssistantPage" }] },
+    { "id": "rbac", "type": "security", "label": "JWT + RBAC", "sublabel": "Solo ADMIN", "pos": [450, 85], "size": [145, 64], "sources": [{ "path": "apps/api/src/domain.controller.ts", "line": 230, "end_line": 236, "label": "Guard del asistente" }] },
+    { "id": "assistant-api", "type": "backend", "label": "POST /admin/assistant", "sublabel": "Mensaje de 2–300 caracteres", "pos": [450, 280], "size": [180, 68], "sources": [{ "path": "apps/api/src/domain.controller.ts", "line": 230, "end_line": 236, "label": "Endpoint assistant" }] },
+    { "id": "intent", "type": "backend", "label": "Motor de intenciones", "sublabel": "Reglas normalizadas", "pos": [695, 280], "size": [175, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 701, "end_line": 763, "label": "adminAssistant()" }] },
+    { "id": "live-services", "type": "backend", "label": "Consultas vivas", "sublabel": "Reporte, riesgo y destinos", "pos": [930, 280], "size": [175, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 701, "end_line": 762, "label": "Fuentes del asistente" }] },
+    { "id": "mysql", "type": "database", "label": "MySQL", "sublabel": "Datos sintéticos", "pos": [940, 85], "size": [155, 64], "sources": [{ "path": "database/init/001_schema.sql", "line": 109, "end_line": 188, "label": "Datos operativos" }] },
+    { "id": "answer", "type": "frontend", "label": "Respuesta explicable", "sublabel": "Texto, datos y acción", "pos": [1165, 280], "size": [175, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 468, "end_line": 474, "label": "Render de respuesta" }] }
+  ],
+  "boundaries": [{ "kind": "region", "label": "Entorno local Docker", "wraps": ["chat-ui", "rbac", "assistant-api", "intent", "live-services", "mysql", "answer"], "pad": 24 }],
+  "connections": [
+    { "from": "admin", "to": "chat-ui", "label": "pregunta", "variant": "emphasis" },
+    { "from": "chat-ui", "to": "assistant-api", "label": "JSON + JWT" },
+    { "from": "rbac", "to": "assistant-api", "label": "autoriza", "variant": "security", "fromSide": "bottom", "toSide": "top" },
+    { "from": "assistant-api", "to": "intent", "label": "normaliza" },
+    { "from": "intent", "to": "live-services", "label": "selecciona consulta" },
+    { "from": "mysql", "to": "live-services", "label": "SQL predefinido", "fromSide": "bottom", "toSide": "top" },
+    { "from": "live-services", "to": "answer", "label": "respuesta estructurada" },
+    { "from": "answer", "to": "admin", "label": "informa; no ejecuta cambios", "variant": "dashed", "fromSide": "bottom", "toSide": "bottom", "route": "auto", "via": [[1252.5, 500], [112.5, 500]] }
+  ],
+  "cards": [
+    { "dot": "violet", "title": "Intenciones", "items": ["Reservas e ingresos", "Usuarios y reclamos", "Servicios, destinos y riesgo"] },
+    { "dot": "emerald", "title": "Reproducible", "items": ["Sin API externa", "Sin costo por consulta", "Resultados basados en MySQL"] },
+    { "dot": "rose", "title": "Límites", "items": ["No es IA generativa", "No modifica datos", "No reemplaza decisiones humanas"] }
+  ]
+}

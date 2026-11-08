@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AndesGo — Riesgo de cancelación",
+    "subtitle": "Sprint 4 + integración Sprint 5 · Puntaje heurístico explicable",
+    "locale": "es",
+    "output": "docs/final/ia/arquitecturas/riesgo-cancelacion.html",
+    "animation": "trace",
+    "visual_preset": "blueprint",
+    "quality_profile": "showcase",
+    "repository": { "url": "https://github.com/aleS1404/Sistema-Agencia-Viajes.git", "provider": "github", "link_mode": "web", "revision": "04fae33a688d1bcad03597d2d3680f70b3211399" },
+    "views": [
+      { "id": "extraccion", "label": "Extracción de señales", "focus": ["endpoint", "features", "mysql"], "note": "Reserva, pago, antecedentes, reclamos, importe y fecha." },
+      { "id": "puntuacion", "label": "Puntuación", "focus": ["features", "rules", "score"], "note": "Reglas ponderadas, límite 100 y umbrales visibles." },
+      { "id": "revision", "label": "Revisión humana", "focus": ["score", "risk-table", "admin"], "note": "El modelo prioriza; el administrador decide." }
+    ]
+  },
+  "components": [
+    { "id": "admin", "type": "external", "label": "Administrador", "sublabel": "Revisión humana", "pos": [40, 290], "size": [145, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 459, "end_line": 462, "label": "Tabla de riesgo" }] },
+    { "id": "risk-table", "type": "frontend", "label": "Tabla preventiva", "sublabel": "Puntaje, nivel y factores", "pos": [240, 290], "size": [170, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 459, "end_line": 462, "label": "Vista de riesgos" }] },
+    { "id": "rbac", "type": "security", "label": "JWT + RBAC", "sublabel": "Solo ADMIN", "pos": [465, 90], "size": [145, 64], "sources": [{ "path": "apps/api/src/domain.controller.ts", "line": 223, "end_line": 229, "label": "Guard de riesgo" }] },
+    { "id": "endpoint", "type": "backend", "label": "GET /cancellation-risk", "sublabel": "Filtros por estado/destino", "pos": [465, 290], "size": [180, 68], "sources": [{ "path": "apps/api/src/domain.controller.ts", "line": 223, "end_line": 229, "label": "Endpoint de riesgo" }] },
+    { "id": "features", "type": "backend", "label": "Extracción de señales", "sublabel": "JOIN y subconsultas", "pos": [710, 290], "size": [175, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 653, "end_line": 678, "label": "Consulta de señales" }] },
+    { "id": "mysql", "type": "database", "label": "MySQL", "sublabel": "Reservas, pagos y postventa", "pos": [720, 90], "size": [165, 64], "sources": [{ "path": "database/init/001_schema.sql", "line": 109, "end_line": 188, "label": "Tablas fuente" }] },
+    { "id": "rules", "type": "backend", "label": "Reglas ponderadas", "sublabel": "Pesos auditables", "pos": [940, 290], "size": [170, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 680, "end_line": 697, "label": "Reglas y pesos" }] },
+    { "id": "score", "type": "backend", "label": "Puntaje 0–100", "sublabel": "Bajo <35 · Medio <60 · Alto", "pos": [1170, 290], "size": [180, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 695, "end_line": 699, "label": "Umbrales" }] }
+  ],
+  "boundaries": [{ "kind": "region", "label": "Módulo analítico local", "wraps": ["risk-table", "rbac", "endpoint", "features", "mysql", "rules", "score"], "pad": 24 }],
+  "connections": [
+    { "from": "admin", "to": "risk-table", "label": "consulta", "variant": "emphasis" },
+    { "from": "risk-table", "to": "endpoint", "label": "GET + JWT" },
+    { "from": "rbac", "to": "endpoint", "label": "autoriza", "variant": "security", "fromSide": "bottom", "toSide": "top" },
+    { "from": "endpoint", "to": "features", "label": "filtros" },
+    { "from": "mysql", "to": "features", "label": "señales", "fromSide": "bottom", "toSide": "top" },
+    { "from": "features", "to": "rules", "label": "variables observadas" },
+    { "from": "rules", "to": "score", "label": "suma limitada" },
+    { "from": "score", "to": "risk-table", "label": "orden + factores", "variant": "dashed", "fromSide": "bottom", "toSide": "bottom", "route": "auto", "via": [[1260, 500], [325, 500]] }
+  ],
+  "cards": [
+    { "dot": "amber", "title": "Señales", "items": ["Estado y pago", "Antecedentes y reclamos", "Importe y proximidad"] },
+    { "dot": "cyan", "title": "Salida", "items": ["Puntaje", "Nivel", "Factores explicativos"] },
+    { "dot": "rose", "title": "Gobernanza", "items": ["Sin atributos sensibles", "Sin cancelación automática", "Pesos académicos no calibrados"] }
+  ]
+}

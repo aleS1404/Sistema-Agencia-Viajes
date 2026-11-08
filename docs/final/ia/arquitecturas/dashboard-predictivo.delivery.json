@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "7f71339c-5811-4418-8f99-c7f1db621121",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\.archify\\architecture-dashboard-predictivo-20261108-1252\\candidate.json",
+  "output": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\dashboard-predictivo.html",
+  "specification": {
+    "sha256": "37f76115ee1027273f74a40991801bc7bdd5a3349a8ce747dbfeb3f3e45915fe",
+    "bytes": 5118
+  },
+  "artifact": {
+    "sha256": "4fc77a07fe84cc0e39431289250417a74406a30e8dbca23a1be9a95eaa864901",
+    "bytes": 852255
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\.archify\\architecture-dashboard-predictivo-20261108-1252\\candidate.json",
+    "sha256": "37f76115ee1027273f74a40991801bc7bdd5a3349a8ce747dbfeb3f3e45915fe",
+    "bytes": 5118
+  },
+  "artifact": {
+    "path": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\dashboard-predictivo.html",
+    "sha256": "4fc77a07fe84cc0e39431289250417a74406a30e8dbca23a1be9a95eaa864901",
+    "bytes": 852255
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\dashboard-predictivo.review-2\\dashboard-predictivo.finalize.json",
+    "summaryReceipt": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\dashboard-predictivo.review-2\\dashboard-predictivo.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\ia\\arquitecturas\\dashboard-predictivo.review-2\\dashboard-predictivo.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-08T04:55:30.296Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 4524,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "routesOverSuggestedBends": 1
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [],
+      "detours": [
+        {
+          "relationship": {
+            "from": "dashboard-ui",
+            "to": "dashboard-api",
+            "label": "filtros + JWT",
+            "collectionIndex": 1,
+            "artifactIndex": 2
+          },
+          "bends": 3,
+          "stretch": 1.315
+        }
+      ],
+      "truncated": false
+    },
+    "hints": [
+      "dashboard-ui → dashboard-api needs 3 bends: move node dashboard-ui or dashboard-api so they share a row or column with matching centers, or sit diagonally with a clear corner."
+    ],
+    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
+  }
+}

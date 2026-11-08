@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AndesGo — Dashboard predictivo",
+    "subtitle": "Sprint 5 · KPI, alertas, regresión lineal y riesgo explicable",
+    "locale": "es",
+    "output": "docs/final/ia/arquitecturas/dashboard-predictivo.html",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/aleS1404/Sistema-Agencia-Viajes.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "04fae33a688d1bcad03597d2d3680f70b3211399"
+    },
+    "views": [
+      { "id": "consulta", "label": "Consulta administrativa", "focus": ["admin", "dashboard-ui", "dashboard-api", "aggregation"], "note": "Filtros autenticados y agregación de KPI." },
+      { "id": "prediccion", "label": "Predicción", "focus": ["aggregation", "forecast", "visualization"], "note": "Regresión lineal simple con alcance académico." },
+      { "id": "riesgo", "label": "Riesgo", "focus": ["aggregation", "risk", "visualization"], "note": "Puntaje y factores visibles, sin decisión automática." }
+    ]
+  },
+  "components": [
+    { "id": "admin", "type": "external", "label": "Administrador", "sublabel": "Navegador", "pos": [40, 290], "size": [145, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 444, "end_line": 464, "label": "Pantalla dashboard" }] },
+    { "id": "dashboard-ui", "type": "frontend", "label": "Dashboard React", "sublabel": "Filtros, KPI y alertas", "pos": [245, 290], "size": [165, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 444, "end_line": 464, "label": "ReportsPage" }] },
+    { "id": "rbac", "type": "security", "label": "JWT + RBAC", "sublabel": "Solo ADMIN", "pos": [455, 90], "size": [150, 64], "sources": [{ "path": "apps/api/src/domain.controller.ts", "line": 216, "end_line": 235, "label": "Guards y rol" }] },
+    { "id": "dashboard-api", "type": "backend", "label": "GET /admin/dashboard", "sublabel": "NestJS Controller", "pos": [455, 290], "size": [175, 68], "sources": [{ "path": "apps/api/src/domain.controller.ts", "line": 216, "end_line": 223, "label": "Endpoint dashboard" }] },
+    { "id": "aggregation", "type": "backend", "label": "Agregación analítica", "sublabel": "KPI, series y alertas", "pos": [700, 290], "size": [175, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 528, "end_line": 651, "label": "dashboard()" }] },
+    { "id": "mysql", "type": "database", "label": "MySQL", "sublabel": "Reservas, pagos y usuarios", "pos": [710, 90], "size": [165, 64], "sources": [{ "path": "database/init/001_schema.sql", "line": 109, "end_line": 188, "label": "Tablas operativas" }] },
+    { "id": "forecast", "type": "backend", "label": "Regresión lineal", "sublabel": "7, 14 o 30 días", "pos": [930, 205], "size": [165, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 765, "end_line": 819, "label": "buildForecast()" }] },
+    { "id": "risk", "type": "backend", "label": "Riesgo explicable", "sublabel": "Puntaje, nivel y factores", "pos": [930, 385], "size": [165, 68], "sources": [{ "path": "apps/api/src/domain.service.ts", "line": 653, "end_line": 699, "label": "cancellationRisks()" }] },
+    { "id": "visualization", "type": "frontend", "label": "Visualización", "sublabel": "Gráfico y tabla preventiva", "pos": [1160, 290], "size": [175, 68], "sources": [{ "path": "apps/web/src/App.tsx", "line": 427, "end_line": 462, "label": "Gráfico y tabla" }] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Docker Compose", "wraps": ["dashboard-ui", "rbac", "dashboard-api", "aggregation", "mysql", "forecast", "risk", "visualization"], "pad": 24 }
+  ],
+  "connections": [
+    { "from": "admin", "to": "dashboard-ui", "label": "consulta", "variant": "emphasis" },
+    { "from": "dashboard-ui", "to": "dashboard-api", "label": "filtros + JWT" },
+    { "from": "rbac", "to": "dashboard-api", "label": "autoriza", "variant": "security", "fromSide": "bottom", "toSide": "top" },
+    { "from": "dashboard-api", "to": "aggregation", "label": "DashboardQueryDto" },
+    { "from": "mysql", "to": "aggregation", "label": "SQL agregado", "fromSide": "bottom", "toSide": "top" },
+    { "from": "aggregation", "to": "forecast", "label": "serie diaria" },
+    { "from": "aggregation", "to": "risk", "label": "reservas activas" },
+    { "from": "forecast", "to": "visualization", "label": "proyección" },
+    { "from": "risk", "to": "visualization", "label": "factores" },
+    { "from": "visualization", "to": "admin", "label": "decisión informada", "variant": "dashed", "fromSide": "bottom", "toSide": "bottom", "route": "auto", "via": [[1247.5, 535], [112.5, 535]] }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Resultado", "items": ["Ocho KPI y filtros", "Alertas operativas", "Tendencia e ingreso proyectado"] },
+    { "dot": "amber", "title": "Alcance", "items": ["Datos sintéticos", "Predicción académica", "Revisión humana obligatoria"] },
+    { "dot": "rose", "title": "Seguridad", "items": ["JWT", "Rol ADMIN", "Consultas parametrizadas"] }
+  ]
+}
