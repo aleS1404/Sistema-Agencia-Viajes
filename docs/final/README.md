@@ -10,7 +10,7 @@ Esta carpeta es la fuente documental de la segunda presentación. Mantiene separ
 - `manuales/`: instalación, usuario y demostración.
 - `decisiones/`: decisiones de arquitectura y alcance.
 - `evidencias/`: capturas verificadas del acceso, catálogo y panel administrativo.
-- `presentacion/`: defensa final interactiva en HTML.
+- `presentacion/`: defensa final interactiva en HTML y copia PDF de 16 diapositivas.
 - `diagramas/`: arquitectura general interactiva y exportable.
 
 Los 21 casos quedaron trazados como `PROBADO` el 8 de noviembre de 2026 mediante endpoints, pruebas y recorrido integrado. El informe incorpora 35 diagramas de sprint y tres capturas de la interfaz ejecutada.

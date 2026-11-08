@@ -3,6 +3,7 @@
 .DS_Store
 Thumbs.db
 .archify/
+.frontend-slides/
 __pycache__/
 *.py[cod]
 ~$*

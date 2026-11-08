@@ -112,6 +112,7 @@ Seleccionar una tabla y pulsar **Seleccionar datos**. Para la defensa conviene m
 - [Guion de demostración](docs/final/manuales/guion-demostracion.md)
 - [Guía interactiva de usuarios y tablas](docs/guia-usuarios-y-tablas.html)
 - [Presentación final interactiva](docs/final/presentacion/index.html)
+- [Presentación final en PDF](docs/final/presentacion/AndesGo-Presentacion-Final.pdf)
 - [Arquitectura interactiva](docs/final/diagramas/arquitectura-interactiva.html)
 - [Evidencias visuales](docs/final/evidencias)
 

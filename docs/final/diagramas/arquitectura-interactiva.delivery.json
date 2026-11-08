@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "f2677040-d6f5-4012-997b-820b97ed30bd",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\.archify\\architecture-producto-final-20261108-0055\\candidate.json",
+  "output": "C:\\Users\\ALEXANDRA\\Desktop\\TALLER\\proyTaller\\docs\\final\\diagramas\\arquitectura-interactiva.html",
+  "specification": {
+    "sha256": "1da68274885869ac03458f0699914a33dd27b64112aea178dc6d26704e22b78f",
+    "bytes": 8602
+  },
+  "artifact": {
+    "sha256": "3273415a5066e1ed7a4add2f4653cb0f7cbcb9f80d1e4892e57381897ffd6e40",
+    "bytes": 863083
+  }
+}

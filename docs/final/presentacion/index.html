@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Defensa final del sistema prototipo de gestión turística AndesGo.">
+  <title>AndesGo · Defensa final</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ===========================================
+       TEMA ANDESGO — verde altiplano + dorado
+       Modifique estas variables para ajustar toda la presentación.
+       =========================================== */
+    :root {
+      --stage-bg: #071d18;
+      --slide-bg: #f5f1e8;
+      --green-950: #071d18;
+      --green-900: #0b382c;
+      --green-800: #14513f;
+      --green-700: #21664f;
+      --sage: #dcebe1;
+      --cream: #f5f1e8;
+      --paper: #fffdf8;
+      --gold: #eabf62;
+      --gold-dark: #9c6c16;
+      --ink: #0b2d25;
+      --muted: #66736e;
+      --line: rgba(11, 56, 44, 0.18);
+      --font-display: 'Fraunces', serif;
+      --font-body: 'Manrope', sans-serif;
+      --ease: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    /* ===========================================
+       FIXED 16:9 STAGE: MANDATORY BASE STYLES
+       Slides are authored at 1920×1080 and scaled as a whole.
+       =========================================== */
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: var(--stage-bg, #000);
+    }
+
+    .deck-viewport {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        background: var(--stage-bg, #000);
+    }
+
+    .deck-stage {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        transform-origin: 0 0;
+        background: var(--slide-bg, #fff);
+    }
+
+    .slide {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        display: block;
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+        background: var(--slide-bg, #fff);
+    }
+
+    .slide.active,
+    .slide.visible {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+        z-index: 1;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .deck-controls {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        transform: translateX(-50%);
+        z-index: 1000;
+    }
+
+    @media print {
+        html,
+        body {
+            width: 1920px;
+            height: auto;
+            overflow: visible;
+            background: #fff;
+        }
+
+        .deck-viewport {
+            position: static;
+            overflow: visible;
+            background: #fff;
+        }
+
+        .deck-stage {
+            position: static;
+            width: auto;
+            height: auto;
+            transform: none !important;
+            background: none;
+        }
+
+        .slide {
+            position: relative;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            width: 1920px;
+            height: 1080px;
+            break-after: page;
+            page-break-after: always;
+        }
+
+        .slide:last-child {
+            break-after: auto;
+            page-break-after: auto;
+        }
+
+        .deck-controls { display: none !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.2s !important;
+        }
+    }
+
+    /* ===========================================
+       BASE TIPOGRÁFICA Y COMPOSICIÓN
+       =========================================== */
+    body { font-family: var(--font-body); color: var(--ink); }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.035em; }
+    h1 { font-size: 110px; line-height: .98; }
+    h2 { font-size: 78px; line-height: 1.02; }
+    h3 { font-size: 37px; line-height: 1.08; }
+    p { font-size: 28px; line-height: 1.48; }
+    strong { font-weight: 800; }
+
+    .slide-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 86px 106px 82px;
+      z-index: 2;
+    }
+    .slide.dark { color: var(--cream); background: var(--green-950); }
+    .slide.green { color: var(--cream); background: var(--green-900); }
+    .slide.paper { background: var(--cream); }
+    .slide.white { background: var(--paper); }
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: .55;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(11, 56, 44, .12) .7px, transparent .7px);
+      background-size: 16px 16px;
+    }
+    .slide.dark::before, .slide.green::before {
+      opacity: .35;
+      background-image: radial-gradient(rgba(245, 241, 232, .15) .7px, transparent .7px);
+    }
+    .contours::after {
+      content: '';
+      position: absolute;
+      width: 940px;
+      height: 940px;
+      border: 1px solid rgba(234, 191, 98, .28);
+      border-radius: 50%;
+      right: -330px;
+      bottom: -560px;
+      box-shadow: 0 0 0 88px rgba(234, 191, 98, .035), 0 0 0 176px rgba(234, 191, 98, .025), 0 0 0 264px rgba(234, 191, 98, .018);
+    }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 17px;
+      color: var(--gold-dark);
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      margin-bottom: 24px;
+    }
+    .dark .kicker, .green .kicker { color: var(--gold); }
+    .kicker::before { content: ''; width: 58px; height: 4px; background: currentColor; }
+    .deck-label {
+      position: absolute;
+      top: 48px;
+      right: 58px;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      color: var(--muted);
+      text-transform: uppercase;
+      z-index: 4;
+    }
+    .dark .deck-label, .green .deck-label { color: rgba(245,241,232,.55); }
+    .slide-number {
+      position: absolute;
+      left: 108px;
+      bottom: 38px;
+      font-size: 16px;
+      letter-spacing: .14em;
+      font-weight: 800;
+      color: var(--muted);
+      z-index: 3;
+    }
+    .dark .slide-number, .green .slide-number { color: rgba(245,241,232,.45); }
+    .subtitle { margin-top: 28px; max-width: 1050px; color: var(--muted); font-size: 31px; }
+    .dark .subtitle, .green .subtitle { color: rgba(245,241,232,.72); }
+    .accent { color: var(--gold-dark); }
+    .dark .accent, .green .accent { color: var(--gold); }
+    .mono { font-family: var(--font-body); font-weight: 800; letter-spacing: .02em; }
+
+    /* ===========================================
+       ANIMACIONES EDITORIALES
+       =========================================== */
+    .reveal, .reveal-left, .reveal-scale {
+      opacity: 0;
+      transition: opacity .72s var(--ease), transform .72s var(--ease);
+    }
+    .reveal { transform: translateY(34px); }
+    .reveal-left { transform: translateX(-46px); }
+    .reveal-scale { transform: scale(.96); }
+    .visible .reveal, .visible .reveal-left, .visible .reveal-scale { opacity: 1; transform: none; }
+    .visible .d1 { transition-delay: .08s; }
+    .visible .d2 { transition-delay: .16s; }
+    .visible .d3 { transition-delay: .24s; }
+    .visible .d4 { transition-delay: .32s; }
+    .visible .d5 { transition-delay: .40s; }
+    .visible .d6 { transition-delay: .48s; }
+
+    /* ===========================================
+       COMPONENTES VISUALES REUTILIZABLES
+       =========================================== */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 54px; align-items: center; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .card {
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 34px;
+      box-shadow: 0 18px 50px rgba(11,45,37,.07);
+    }
+    .dark .card, .green .card {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(245,241,232,.16);
+      box-shadow: none;
+    }
+    .card p { color: var(--muted); font-size: 23px; margin-top: 13px; }
+    .dark .card p, .green .card p { color: rgba(245,241,232,.66); }
+    .card-number { color: var(--gold-dark); font-size: 72px; line-height: 1; font-family: var(--font-display); font-weight: 800; }
+    .dark .card-number, .green .card-number { color: var(--gold); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 17px;
+      border-radius: 999px;
+      background: var(--sage);
+      color: var(--green-900);
+      font-size: 17px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .dark .pill, .green .pill { background: rgba(234,191,98,.16); color: var(--gold); border: 1px solid rgba(234,191,98,.28); }
+    .icon-box {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      background: var(--sage);
+      color: var(--green-800);
+      font-size: 26px;
+      font-weight: 800;
+    }
+    .gold-rule { width: 100%; height: 3px; background: linear-gradient(90deg, var(--gold), transparent); margin: 35px 0; }
+    .image-frame {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 0 28px 72px rgba(7,29,24,.18);
+    }
+    .image-frame img { width: 100%; height: 100%; display: block; object-fit: contain; }
+    .image-caption {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      background: rgba(7,29,24,.88);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* ===========================================
+       SLIDES ESPECÍFICAS
+       =========================================== */
+    .title-layout { display: grid; grid-template-columns: 1.22fr .78fr; height: 100%; align-items: center; gap: 90px; }
+    .brand-mark { display: flex; align-items: center; gap: 18px; font-size: 26px; font-weight: 800; margin-bottom: 118px; }
+    .brand-symbol { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 16px; color: var(--green-950); background: var(--gold); font-family: var(--font-display); font-size: 30px; }
+    .title-meta { display: flex; gap: 50px; margin-top: 50px; color: rgba(245,241,232,.68); font-size: 20px; }
+    .title-monogram { position: relative; display: grid; place-items: center; width: 610px; height: 610px; border-radius: 50%; border: 1px solid rgba(234,191,98,.48); }
+    .title-monogram::before, .title-monogram::after { content: ''; position: absolute; border-radius: 50%; border: 1px solid rgba(234,191,98,.22); }
+    .title-monogram::before { inset: 70px; }
+    .title-monogram::after { inset: 145px; }
+    .title-monogram span { font-family: var(--font-display); font-size: 170px; font-weight: 800; color: var(--gold); }
+    .title-monogram small { position: absolute; bottom: 122px; font-size: 19px; letter-spacing: .18em; text-transform: uppercase; }
+
+    .problem-flow { display: grid; grid-template-columns: 1fr 110px 1fr; align-items: center; gap: 22px; margin-top: 78px; }
+    .problem-side { padding: 48px; border-radius: 28px; min-height: 420px; }
+    .problem-side.before { background: #efe7d9; border: 1px solid #ddcfba; }
+    .problem-side.after { background: var(--green-900); color: var(--cream); }
+    .problem-side h3 { font-size: 47px; margin: 20px 0 30px; }
+    .problem-side ul { list-style: none; padding: 0; display: grid; gap: 18px; }
+    .problem-side li { font-size: 24px; display: flex; gap: 15px; align-items: center; }
+    .problem-side li::before { content: '—'; color: var(--gold-dark); font-weight: 800; }
+    .problem-side.after li::before { color: var(--gold); }
+    .flow-arrow { text-align: center; font-size: 74px; color: var(--gold-dark); }
+
+    .scope-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 70px; margin-top: 55px; align-items: stretch; }
+    .scope-promise { background: var(--green-900); color: var(--cream); border-radius: 30px; padding: 58px; display: flex; flex-direction: column; justify-content: space-between; }
+    .scope-promise blockquote { margin: 0; font-family: var(--font-display); font-size: 56px; line-height: 1.12; }
+    .scope-limits { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .scope-limits .card { padding: 30px; }
+    .scope-limits strong { display: block; font-size: 25px; margin-top: 22px; }
+
+    .usecase-layout { display: grid; grid-template-columns: .54fr 1.46fr; gap: 44px; height: 790px; margin-top: 28px; }
+    .usecase-copy { display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+    .usecase-copy .big-stat { font-family: var(--font-display); font-size: 156px; line-height: .8; color: var(--gold-dark); }
+    .usecase-copy p { font-size: 26px; color: var(--muted); }
+    .usecase-image { height: 770px; padding: 18px; }
+
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 68px; }
+    .team-card { position: relative; min-height: 500px; padding: 42px; border-radius: 28px; background: rgba(255,255,255,.07); border: 1px solid rgba(245,241,232,.16); }
+    .team-card::after { content: attr(data-initial); position: absolute; right: 26px; bottom: 4px; font-family: var(--font-display); font-size: 160px; font-weight: 800; color: rgba(234,191,98,.09); }
+    .team-card .role { color: var(--gold); font-weight: 800; font-size: 18px; letter-spacing: .12em; text-transform: uppercase; }
+    .team-card h3 { font-size: 45px; margin: 34px 0 20px; }
+    .team-card p { color: rgba(245,241,232,.68); font-size: 24px; }
+    .team-card .also { position: absolute; bottom: 36px; left: 42px; font-size: 19px; color: rgba(245,241,232,.48); }
+
+    .sprint-track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 75px; position: relative; }
+    .sprint-track::before { content: ''; position: absolute; left: 5%; right: 5%; top: 38px; height: 3px; background: rgba(234,191,98,.35); }
+    .sprint { position: relative; padding-top: 90px; }
+    .sprint::before { content: ''; position: absolute; top: 20px; left: 24px; width: 38px; height: 38px; border-radius: 50%; background: var(--gold); border: 8px solid var(--green-900); box-shadow: 0 0 0 3px var(--gold); z-index: 2; }
+    .sprint-card { min-height: 360px; background: rgba(255,255,255,.07); border: 1px solid rgba(245,241,232,.14); border-radius: 24px; padding: 29px; }
+    .sprint-card small { color: var(--gold); font-weight: 800; letter-spacing: .12em; }
+    .sprint-card h3 { font-size: 32px; margin: 18px 0; }
+    .sprint-card p { font-size: 20px; color: rgba(245,241,232,.65); }
+    .sprint-card .count { position: absolute; bottom: 28px; font-size: 18px; font-weight: 800; }
+
+    .models-layout { display: grid; grid-template-columns: .92fr 1.08fr; gap: 50px; margin-top: 52px; align-items: center; }
+    .model-list { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+    .model-item { display: flex; align-items: center; gap: 18px; padding: 18px 20px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.62); font-size: 20px; font-weight: 700; }
+    .model-item span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: var(--green-900); color: var(--gold); font-size: 16px; }
+    .model-highlight { height: 510px; padding: 16px; }
+    .model-highlight img { object-fit: contain; }
+
+    .architecture-layout { display: grid; grid-template-columns: .56fr 1.44fr; gap: 42px; align-items: center; margin-top: 40px; }
+    .architecture-copy { display: grid; gap: 16px; }
+    .layer-chip { padding: 19px 22px; border-left: 5px solid var(--gold); background: rgba(255,255,255,.07); border-radius: 0 14px 14px 0; }
+    .layer-chip strong { display: block; font-size: 21px; }
+    .layer-chip span { color: rgba(245,241,232,.6); font-size: 17px; }
+    .architecture-image { height: 640px; padding: 22px; }
+
+    .evidence-layout { display: grid; grid-template-columns: .52fr 1.48fr; gap: 52px; align-items: center; margin-top: 38px; }
+    .evidence-copy h2 { font-size: 72px; }
+    .evidence-copy p { font-size: 26px; color: var(--muted); margin-top: 25px; }
+    .evidence-points { margin-top: 35px; display: grid; gap: 15px; }
+    .evidence-point { display: flex; gap: 14px; align-items: center; font-size: 21px; font-weight: 700; }
+    .evidence-point span { color: var(--gold-dark); }
+    .evidence-image { height: 775px; }
+    .evidence-image img.cover { object-fit: cover; object-position: top; }
+
+    .data-layout { display: grid; grid-template-columns: .47fr 1.53fr; gap: 44px; align-items: center; margin-top: 18px; }
+    .domain-stack { display: grid; gap: 17px; }
+    .domain { padding: 22px 24px; border-radius: 16px; color: var(--cream); }
+    .domain:nth-child(1) { background: #6849b8; }
+    .domain:nth-child(2) { background: #1689a9; }
+    .domain:nth-child(3) { background: #168661; }
+    .domain strong { font-size: 22px; }
+    .domain p { font-size: 17px; color: rgba(255,255,255,.76); margin-top: 6px; }
+    .data-image { height: 620px; padding: 10px; }
+
+    .security-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 66px; }
+    .security-card { position: relative; min-height: 390px; padding: 35px; background: rgba(255,255,255,.07); border: 1px solid rgba(245,241,232,.14); border-radius: 24px; }
+    .security-card .index { font-family: var(--font-display); font-size: 65px; color: var(--gold); }
+    .security-card h3 { font-size: 33px; margin: 24px 0 18px; }
+    .security-card p { font-size: 21px; color: rgba(245,241,232,.62); }
+    .security-evidence { display: flex; gap: 36px; margin-top: 38px; font-size: 20px; color: rgba(245,241,232,.72); }
+    .security-evidence strong { color: var(--gold); }
+
+    .quality-layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; margin-top: 58px; }
+    .quality-results { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .result-card { min-height: 190px; border-radius: 22px; background: white; border: 1px solid var(--line); padding: 28px; }
+    .result-card strong { display: block; font-family: var(--font-display); font-size: 50px; color: var(--green-800); }
+    .result-card span { display: block; margin-top: 8px; font-size: 19px; color: var(--muted); }
+    .limits-card { background: #efe5d4; border: 1px solid #deceb1; border-radius: 24px; padding: 38px; }
+    .limits-card h3 { margin-bottom: 22px; }
+    .limits-card ul { margin: 0; padding-left: 26px; display: grid; gap: 18px; }
+    .limits-card li { font-size: 22px; line-height: 1.35; }
+
+    .demo-path { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 112px; }
+    .demo-path::before { content: ''; position: absolute; top: 44px; left: 6%; right: 6%; height: 4px; background: linear-gradient(90deg, var(--gold), #fff0); }
+    .demo-step { position: relative; padding-top: 106px; text-align: center; }
+    .demo-step::before { content: attr(data-step); position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 88px; height: 88px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: var(--green-950); font-family: var(--font-display); font-size: 38px; font-weight: 800; border: 10px solid var(--green-900); box-shadow: 0 0 0 2px var(--gold); z-index: 2; }
+    .demo-step strong { font-size: 21px; }
+    .demo-step span { display: block; color: rgba(245,241,232,.55); margin-top: 8px; font-size: 16px; }
+    .demo-note { margin-top: 70px; text-align: center; color: rgba(245,241,232,.66); font-size: 23px; }
+
+    .closing-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 90px; height: 100%; align-items: center; }
+    .closing-title { font-size: 112px; max-width: 1000px; }
+    .closing-summary { margin-top: 42px; font-size: 28px; color: rgba(245,241,232,.7); max-width: 950px; }
+    .future-stack { display: grid; gap: 18px; }
+    .future-item { padding: 27px 30px; border-radius: 18px; background: rgba(255,255,255,.07); border: 1px solid rgba(245,241,232,.14); }
+    .future-item small { color: var(--gold); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .future-item strong { display: block; margin-top: 8px; font-size: 23px; }
+    .team-signoff { position: absolute; left: 106px; bottom: 80px; color: rgba(245,241,232,.5); font-size: 18px; }
+
+    /* ===========================================
+       CONTROLES FUERA DEL ESCENARIO
+       =========================================== */
+    .deck-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(7,29,24,.88);
+      border: 1px solid rgba(245,241,232,.18);
+      color: white;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+    }
+    .control-btn { width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: #fff; cursor: pointer; font-size: 22px; }
+    .control-btn:hover { background: rgba(255,255,255,.12); }
+    .counter { min-width: 74px; text-align: center; font-size: 14px; font-weight: 800; letter-spacing: .08em; }
+    .progress { position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: var(--gold); z-index: 1500; transition: width .35s var(--ease); }
+
+    /* ===========================================
+       EDICIÓN INLINE — E para activar
+       =========================================== */
+    .edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+    .edit-toggle { position: fixed; top: 18px; left: 18px; width: 46px; height: 46px; border: 1px solid rgba(255,255,255,.25); border-radius: 14px; background: rgba(7,29,24,.9); color: white; opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 10001; cursor: pointer; }
+    .edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+    .edit-toolbar { position: fixed; top: 20px; left: 78px; z-index: 10001; display: none; gap: 8px; padding: 7px; border-radius: 12px; background: rgba(7,29,24,.92); }
+    .edit-toolbar.active { display: flex; }
+    .edit-toolbar button { border: 0; border-radius: 8px; padding: 9px 13px; color: white; background: rgba(255,255,255,.12); font-family: var(--font-body); cursor: pointer; }
+    [contenteditable="true"] { outline: 2px dashed var(--gold) !important; outline-offset: 5px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <!-- Escenario fijo; todas las diapositivas viven en el mismo lienzo 1920×1080. -->
+  <div class="deck-viewport">
+    <main class="deck-stage" id="deckStage" aria-live="polite">
+
+      <!-- 01 · Portada -->
+      <section class="slide dark contours active" aria-label="Portada">
+        <span class="deck-label">Defensa final · 2026</span>
+        <div class="slide-inner title-layout">
+          <div>
+            <div class="brand-mark reveal d1"><span class="brand-symbol">A</span><span>AndesGo</span></div>
+            <div class="kicker reveal d2" data-edit>Proyecto de Técnico Superior</div>
+            <h1 class="reveal d3" data-edit>Gestión turística<br><span class="accent">con contexto.</span></h1>
+            <p class="subtitle reveal d4" data-edit>Prototipo para una agencia de viajes de La Paz, inspirado en Booking.com.</p>
+            <div class="title-meta reveal d5"><span data-edit>Sheyla Condori</span><span data-edit>Melani Masco</span><span data-edit>Alexandra Salazar</span></div>
+          </div>
+          <div class="title-monogram reveal-scale d3"><span>LP</span><small data-edit>La Paz · Bolivia</small></div>
+        </div>
+        <span class="slide-number">01 / 16</span>
+      </section>
+
+      <!-- 02 · Problema -->
+      <section class="slide paper" aria-label="Problema y transformación">
+        <span class="deck-label">Marco referencial</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>El problema</div>
+          <h2 class="reveal d2" data-edit>La información dispersa<br>rompe el viaje.</h2>
+          <div class="problem-flow">
+            <article class="problem-side before reveal-left d3">
+              <span class="pill">Antes</span>
+              <h3 data-edit>Decisiones fragmentadas</h3>
+              <ul><li data-edit>Servicios sin comparación común</li><li data-edit>Preferencias separadas de la reserva</li><li data-edit>Postventa sin trazabilidad</li></ul>
+            </article>
+            <div class="flow-arrow reveal d4">→</div>
+            <article class="problem-side after reveal d5">
+              <span class="pill">Propuesta</span>
+              <h3 data-edit>Un recorrido integrado</h3>
+              <ul><li data-edit>Catálogo y recomendación explicable</li><li data-edit>Reserva y pago simulado</li><li data-edit>Atención, auditoría y reportes</li></ul>
+            </article>
+          </div>
+        </div>
+        <span class="slide-number">02 / 16</span>
+      </section>
+
+      <!-- 03 · Alcance -->
+      <section class="slide white contours" aria-label="Alcance y límites">
+        <span class="deck-label">Alcance</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Qué construimos</div>
+          <h2 class="reveal d2" data-edit>Un producto completo.<br><span class="accent">Un alcance honesto.</span></h2>
+          <div class="scope-grid">
+            <article class="scope-promise reveal-left d3">
+              <blockquote data-edit>“Del interés del viajero a una operación trazable.”</blockquote>
+              <p data-edit>Catálogo, perfiles, recomendación, reservas, pagos, postventa y gestión administrativa.</p>
+            </article>
+            <div class="scope-limits">
+              <article class="card reveal d3"><div class="icon-box">01</div><strong data-edit>Datos sintéticos</strong><p data-edit>Sin información personal ni oferta comercial real.</p></article>
+              <article class="card reveal d4"><div class="icon-box">02</div><strong data-edit>Pagos simulados</strong><p data-edit>Sin tarjetas ni integración bancaria.</p></article>
+              <article class="card reveal d5"><div class="icon-box">03</div><strong data-edit>Ejecución local</strong><p data-edit>Docker reproduce la demostración.</p></article>
+              <article class="card reveal d6"><div class="icon-box">04</div><strong data-edit>Prototipo académico</strong><p data-edit>No sustituye una plataforma productiva.</p></article>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">03 / 16</span>
+      </section>
+
+      <!-- 04 · Casos de uso -->
+      <section class="slide paper" aria-label="Veintiún casos de uso">
+        <span class="deck-label">Product Backlog</span>
+        <div class="slide-inner">
+          <div class="usecase-layout">
+            <div class="usecase-copy">
+              <div class="kicker reveal d1" data-edit>Corrección principal</div>
+              <div class="big-stat reveal d2">21</div>
+              <h2 class="reveal d3" data-edit>casos.<br>Uno a uno.</h2>
+              <p class="reveal d4" data-edit>El backlog dejó de agrupar funciones: cada caso aprobado tiene actor, sprint, criterio, código, prueba y evidencia.</p>
+              <div class="reveal d5"><span class="pill">6 actores del dominio</span></div>
+            </div>
+            <figure class="image-frame usecase-image reveal-scale d3">
+              <img src="../../assets/diagrama-casos-de-uso.jpg" alt="Diagrama aprobado con 21 casos de uso y seis actores">
+              <figcaption class="image-caption">Diagrama aprobado por el equipo</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">04 / 16</span>
+      </section>
+
+      <!-- 05 · Equipo Scrum -->
+      <section class="slide green contours" aria-label="Equipo y roles Scrum">
+        <span class="deck-label">Scrum Team</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Gobernanza del trabajo</div>
+          <h2 class="reveal d2" data-edit>Tres integrantes.<br>Responsabilidad compartida.</h2>
+          <div class="team-grid">
+            <article class="team-card reveal d3" data-initial="S"><span class="role">Product Owner</span><h3 data-edit>Sheyla</h3><p data-edit>Prioriza el backlog, valida alcance, reglas, UML y seguridad.</p><span class="also">Developer · Sistemas</span></article>
+            <article class="team-card reveal d4" data-initial="M"><span class="role">Integración</span><h3 data-edit>Melani</h3><p data-edit>Coordina frontend, API, base de datos y versión ejecutable.</p><span class="also">Developer · Desarrollo</span></article>
+            <article class="team-card reveal d5" data-initial="A"><span class="role">Scrum Master</span><h3 data-edit>Alexandra</h3><p data-edit>Facilita eventos, IA, datos, pruebas y trazabilidad documental.</p><span class="also">Developer · IA y datos</span></article>
+          </div>
+        </div>
+        <span class="slide-number">05 / 16</span>
+      </section>
+
+      <!-- 06 · Sprints -->
+      <section class="slide dark" aria-label="Cinco sprints">
+        <span class="deck-label">Plan y ejecución</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Cinco incrementos</div>
+          <h2 class="reveal d2" data-edit>El viaje se construyó<br>por capacidades.</h2>
+          <div class="sprint-track">
+            <div class="sprint reveal d2"><article class="sprint-card"><small>S01</small><h3 data-edit>Identidad</h3><p data-edit>Acceso, perfil, usuarios y seguridad.</p><span class="count">4 casos</span></article></div>
+            <div class="sprint reveal d3"><article class="sprint-card"><small>S02</small><h3 data-edit>Catálogo + IA</h3><p data-edit>Búsqueda, oferta y recomendación.</p><span class="count">5 casos</span></article></div>
+            <div class="sprint reveal d4"><article class="sprint-card"><small>S03</small><h3 data-edit>Reserva</h3><p data-edit>Itinerario, estado y pago simulado.</p><span class="count">5 casos</span></article></div>
+            <div class="sprint reveal d5"><article class="sprint-card"><small>S04</small><h3 data-edit>Postventa</h3><p data-edit>Cancelación, reembolso y reclamo.</p><span class="count">5 casos</span></article></div>
+            <div class="sprint reveal d6"><article class="sprint-card"><small>S05</small><h3 data-edit>Control</h3><p data-edit>Políticas, reportes e integración.</p><span class="count">2 casos + regresión</span></article></div>
+          </div>
+        </div>
+        <span class="slide-number">06 / 16</span>
+      </section>
+
+      <!-- 07 · Modelos por sprint -->
+      <section class="slide paper" aria-label="Modelos de cada sprint">
+        <span class="deck-label">Diseño antes de evidencia</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Disciplina visual</div>
+          <h2 class="reveal d2" data-edit>Siete miradas<br>por cada sprint.</h2>
+          <div class="models-layout">
+            <div class="model-list">
+              <div class="model-item reveal d2"><span>01</span><div data-edit>Casos de uso</div></div>
+              <div class="model-item reveal d3"><span>02</span><div data-edit>Clases</div></div>
+              <div class="model-item reveal d3"><span>03</span><div data-edit>Navegación</div></div>
+              <div class="model-item reveal d4"><span>04</span><div data-edit>Presentación</div></div>
+              <div class="model-item reveal d4"><span>05</span><div data-edit>Proceso</div></div>
+              <div class="model-item reveal d5"><span>06</span><div data-edit>Datos: ER, relacional y físico</div></div>
+              <div class="model-item reveal d5"><span>07</span><div data-edit>Arquitectura del incremento</div></div>
+              <div class="card reveal d6"><div class="card-number">35</div><p data-edit>conjuntos de modelos, más fuentes editables.</p></div>
+            </div>
+            <figure class="image-frame model-highlight reveal-scale d4">
+              <img src="../sprints/sprint-03/diagramas/05-5-modelo-de-proceso.png" alt="Modelo de proceso del Sprint 3 para reserva y pago">
+              <figcaption class="image-caption">Ejemplo · proceso de reserva y pago</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">07 / 16</span>
+      </section>
+
+      <!-- 08 · Arquitectura -->
+      <section class="slide green" aria-label="Arquitectura en capas">
+        <span class="deck-label">Decisión ADR-001</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Arquitectura reproducible</div>
+          <h2 class="reveal d2" data-edit>Capas claras.<br>Una sola decisión tecnológica.</h2>
+          <div class="architecture-layout">
+            <div class="architecture-copy">
+              <div class="layer-chip reveal d2"><strong>Presentación</strong><span>React + Vite + Nginx</span></div>
+              <div class="layer-chip reveal d3"><strong>API</strong><span>NestJS + TypeScript</span></div>
+              <div class="layer-chip reveal d4"><strong>Dominio</strong><span>Reglas, recomendación y auditoría</span></div>
+              <div class="layer-chip reveal d5"><strong>Persistencia</strong><span>TypeORM + MySQL 8.4</span></div>
+              <div class="layer-chip reveal d6"><strong>Infraestructura</strong><span>Docker Compose + Adminer</span></div>
+            </div>
+            <figure class="image-frame architecture-image reveal-scale d4">
+              <img src="../sprints/sprint-05/diagramas/07-7-arquitectura-del-incremento.png" alt="Arquitectura final en capas con Docker, React, NestJS, TypeORM y MySQL">
+              <figcaption class="image-caption">Vista final del incremento</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">08 / 16</span>
+      </section>
+
+      <!-- 09 · Acceso -->
+      <section class="slide white" aria-label="Acceso al producto">
+        <span class="deck-label">Producto · Sprint 1</span>
+        <div class="slide-inner">
+          <div class="evidence-layout">
+            <div class="evidence-copy">
+              <div class="kicker reveal d1" data-edit>Primera barrera</div>
+              <h2 class="reveal d2" data-edit>Acceso por<br><span class="accent">cuatro roles.</span></h2>
+              <p class="reveal d3" data-edit>Cliente, administrador, soporte y proveedor reciben navegación y permisos diferentes.</p>
+              <div class="evidence-points reveal d4"><div class="evidence-point"><span>01</span> Registro e inicio de sesión</div><div class="evidence-point"><span>02</span> JWT y propiedad del recurso</div><div class="evidence-point"><span>03</span> Datos siempre sintéticos</div></div>
+            </div>
+            <figure class="image-frame evidence-image reveal-scale d3">
+              <img src="../evidencias/pantalla-acceso.png" alt="Pantalla real de acceso del sistema AndesGo">
+              <figcaption class="image-caption">Evidencia real · pantalla de acceso</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">09 / 16</span>
+      </section>
+
+      <!-- 10 · Cliente -->
+      <section class="slide paper" aria-label="Experiencia del cliente">
+        <span class="deck-label">Producto · Sprints 2–4</span>
+        <div class="slide-inner">
+          <div class="evidence-layout">
+            <div class="evidence-copy">
+              <div class="kicker reveal d1" data-edit>Recorrido del viajero</div>
+              <h2 class="reveal d2" data-edit>Buscar.<br>Comparar.<br><span class="accent">Reservar.</span></h2>
+              <p class="reveal d3" data-edit>El catálogo conecta filtros, recomendación, reserva, pago simulado y postventa.</p>
+              <div class="evidence-points reveal d4"><div class="evidence-point"><span>12</span> servicios activos en la evidencia</div><div class="evidence-point"><span>05</span> recomendaciones explicables</div></div>
+            </div>
+            <figure class="image-frame evidence-image reveal-scale d3">
+              <img class="cover" src="../evidencias/catalogo-cliente.png" alt="Catálogo real del cliente con filtros y tarjetas de servicios">
+              <figcaption class="image-caption">Evidencia real · catálogo del cliente</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">10 / 16</span>
+      </section>
+
+      <!-- 11 · Administración -->
+      <section class="slide white" aria-label="Reportes administrativos">
+        <span class="deck-label">Producto · Sprint 5</span>
+        <div class="slide-inner">
+          <div class="evidence-layout">
+            <div class="evidence-copy">
+              <div class="kicker reveal d1" data-edit>Control administrativo</div>
+              <h2 class="reveal d2" data-edit>Del dato<br>a una decisión.</h2>
+              <p class="reveal d3" data-edit>Los indicadores describen el conjunto sintético: no se presentan como ventas ni ingresos reales.</p>
+              <div class="evidence-points reveal d4"><div class="evidence-point"><span>03</span> reservas registradas</div><div class="evidence-point"><span>01</span> confirmada</div><div class="evidence-point"><span>02</span> cancelaciones</div></div>
+            </div>
+            <figure class="image-frame evidence-image reveal-scale d3">
+              <img src="../evidencias/panel-administrador.png" alt="Panel real de reportes del administrador">
+              <figcaption class="image-caption">Evidencia real · analítica descriptiva</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">11 / 16</span>
+      </section>
+
+      <!-- 12 · Datos -->
+      <section class="slide paper" aria-label="Modelo de datos">
+        <span class="deck-label">Persistencia</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Diseño físico</div>
+          <h2 class="reveal d2" data-edit>La trazabilidad vive<br>en las relaciones.</h2>
+          <div class="data-layout">
+            <div class="domain-stack">
+              <div class="domain reveal d3"><strong data-edit>Identidad</strong><p data-edit>Roles, usuarios, perfiles e intereses.</p></div>
+              <div class="domain reveal d4"><strong data-edit>Catálogo</strong><p data-edit>Proveedores, destinos, categorías y servicios.</p></div>
+              <div class="domain reveal d5"><strong data-edit>Operación</strong><p data-edit>Reservas, pagos, cancelaciones, reembolsos, reclamos y auditoría.</p></div>
+              <p class="reveal d6" style="font-size:19px;color:var(--muted)" data-edit>Claves foráneas, restricciones e índices protegen la coherencia del prototipo.</p>
+            </div>
+            <figure class="image-frame data-image reveal-scale d4">
+              <img src="../../assets/modelo-entidad-relacion-completo.png" alt="Modelo entidad relación físico completo del prototipo">
+              <figcaption class="image-caption">Modelo físico · fuente SQL versionada</figcaption>
+            </figure>
+          </div>
+        </div>
+        <span class="slide-number">12 / 16</span>
+      </section>
+
+      <!-- 13 · Seguridad -->
+      <section class="slide dark contours" aria-label="Seguridad y trazabilidad">
+        <span class="deck-label">PB-21</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Seguridad transversal</div>
+          <h2 class="reveal d2" data-edit>La interfaz orienta.<br>El servidor decide.</h2>
+          <div class="security-grid">
+            <article class="security-card reveal d2"><div class="index">01</div><h3 data-edit>Identidad</h3><p data-edit>Contraseñas derivadas y sesión JWT.</p></article>
+            <article class="security-card reveal d3"><div class="index">02</div><h3 data-edit>Rol</h3><p data-edit>ADMIN, CUSTOMER, SUPPORT y PROVIDER.</p></article>
+            <article class="security-card reveal d4"><div class="index">03</div><h3 data-edit>Propiedad</h3><p data-edit>Cada usuario accede solo a sus recursos.</p></article>
+            <article class="security-card reveal d5"><div class="index">04</div><h3 data-edit>Auditoría</h3><p data-edit>Las operaciones sensibles dejan evidencia.</p></article>
+          </div>
+          <div class="security-evidence reveal d6"><span><strong>403</strong> al cliente en reportes administrativos</span><span><strong>16</strong> eventos observados en auditoría</span><span><strong>0</strong> datos de tarjeta almacenados</span></div>
+        </div>
+        <span class="slide-number">13 / 16</span>
+      </section>
+
+      <!-- 14 · Pruebas y límites -->
+      <section class="slide paper" aria-label="Pruebas, calidad y limitaciones">
+        <span class="deck-label">Verificación</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Calidad verificable</div>
+          <h2 class="reveal d2" data-edit>Probamos lo entregado.<br><span class="accent">Declaramos lo pendiente.</span></h2>
+          <div class="quality-layout">
+            <div class="quality-results">
+              <article class="result-card reveal d2"><strong>21 / 21</strong><span data-edit>casos en el recorrido integrado</span></article>
+              <article class="result-card reveal d3"><strong>1 / 1</strong><span data-edit>prueba Jest de API aprobada</span></article>
+              <article class="result-card reveal d4"><strong>1 / 1</strong><span data-edit>prueba Vitest web aprobada</span></article>
+              <article class="result-card reveal d5"><strong>HTTP 200</strong><span data-edit>web integrada mediante Docker</span></article>
+            </div>
+            <article class="limits-card reveal d4"><span class="pill">Limitaciones</span><h3 data-edit>Sin maquillar resultados</h3><ul><li data-edit>Cobertura automatizada mínima.</li><li data-edit>Pagos, disponibilidad y datos son simulados.</li><li data-edit>La API conserva dependencias transitivas moderadas reportadas.</li><li data-edit>Requiere ampliar pruebas antes de producción.</li></ul></article>
+          </div>
+        </div>
+        <span class="slide-number">14 / 16</span>
+      </section>
+
+      <!-- 15 · Demo -->
+      <section class="slide green" aria-label="Guion de demostración">
+        <span class="deck-label">Demostración en vivo</span>
+        <div class="slide-inner">
+          <div class="kicker reveal d1" data-edit>Recorrido de defensa</div>
+          <h2 class="reveal d2" data-edit>Una historia.<br>Siete pasos.</h2>
+          <div class="demo-path">
+            <div class="demo-step reveal d2" data-step="1"><strong data-edit>Ingresar</strong><span>Cliente</span></div>
+            <div class="demo-step reveal d3" data-step="2"><strong data-edit>Buscar</strong><span>Catálogo</span></div>
+            <div class="demo-step reveal d3" data-step="3"><strong data-edit>Recomendar</strong><span>Coincidencias</span></div>
+            <div class="demo-step reveal d4" data-step="4"><strong data-edit>Reservar</strong><span>Itinerario</span></div>
+            <div class="demo-step reveal d4" data-step="5"><strong data-edit>Pagar</strong><span>Simulado</span></div>
+            <div class="demo-step reveal d5" data-step="6"><strong data-edit>Atender</strong><span>Postventa</span></div>
+            <div class="demo-step reveal d6" data-step="7"><strong data-edit>Reportar</strong><span>Administrador</span></div>
+          </div>
+          <p class="demo-note reveal d6" data-edit>Plan alterno: capturas, matriz de trazabilidad y Adminer si una interfaz no responde.</p>
+        </div>
+        <span class="slide-number">15 / 16</span>
+      </section>
+
+      <!-- 16 · Cierre -->
+      <section class="slide dark contours" aria-label="Cierre">
+        <span class="deck-label">Conclusión</span>
+        <div class="slide-inner closing-layout">
+          <div>
+            <div class="kicker reveal d1" data-edit>Resultado final</div>
+            <h2 class="closing-title reveal d2" data-edit>Un prototipo<br><span class="accent">defendible y trazable.</span></h2>
+            <p class="closing-summary reveal d3" data-edit>Los 21 casos se conectan con cinco incrementos, modelos, código, datos, pruebas y evidencia visual.</p>
+          </div>
+          <div class="future-stack">
+            <div class="future-item reveal d3"><small>Siguiente paso 01</small><strong data-edit>Ampliar cobertura automatizada</strong></div>
+            <div class="future-item reveal d4"><small>Siguiente paso 02</small><strong data-edit>Corregir dependencias moderadas</strong></div>
+            <div class="future-item reveal d5"><small>Siguiente paso 03</small><strong data-edit>Validar con usuarios antes de producción</strong></div>
+            <div class="card reveal d6"><div class="card-number">Gracias</div><p data-edit>¿Preguntas?</p></div>
+          </div>
+          <div class="team-signoff" data-edit>Condori Alcazar Sheyla Micaela · Masco Vargas Melani · Salazar Gisberth Alexandra Cristal</div>
+        </div>
+        <span class="slide-number">16 / 16</span>
+      </section>
+    </main>
+  </div>
+
+  <!-- Controles de navegación fuera del escenario. -->
+  <nav class="deck-controls" aria-label="Controles de presentación">
+    <button class="control-btn" id="prevBtn" aria-label="Diapositiva anterior">‹</button>
+    <span class="counter" id="counter">01 / 16</span>
+    <button class="control-btn" id="nextBtn" aria-label="Diapositiva siguiente">›</button>
+  </nav>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- Controles de edición: visibles al pasar por la esquina o pulsar E. -->
+  <div class="edit-hotzone" title="Activar edición"></div>
+  <button class="edit-toggle" id="editToggle" aria-label="Alternar edición" title="Modo edición (E)">✎</button>
+  <div class="edit-toolbar" id="editToolbar">
+    <button id="saveEdits">Guardar</button>
+    <button id="resetEdits">Restaurar</button>
+    <button id="downloadDeck">Descargar HTML</button>
+  </div>
+
+  <script>
+    /* ===========================================
+       CONTROLADOR: escala, navegación y progreso
+       =========================================== */
+    class SlidePresentation {
+      constructor() {
+        this.slides = [...document.querySelectorAll('.slide')];
+        this.stage = document.getElementById('deckStage');
+        this.current = Math.max(0, Math.min(Number(location.hash.replace('#', '')) - 1 || 0, this.slides.length - 1));
+        this.lastWheel = 0;
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.scaleStage = this.scaleStage.bind(this);
+        this.setup();
+      }
+      setup() {
+        this.scaleStage();
+        window.addEventListener('resize', this.scaleStage);
+        document.getElementById('prevBtn').addEventListener('click', () => this.go(-1));
+        document.getElementById('nextBtn').addEventListener('click', () => this.go(1));
+        document.addEventListener('keydown', (event) => {
+          if (event.target && event.target.getAttribute && event.target.getAttribute('contenteditable') === 'true') return;
+          if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); this.go(1); }
+          if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) { event.preventDefault(); this.go(-1); }
+          if (event.key === 'Home') this.show(0);
+          if (event.key === 'End') this.show(this.slides.length - 1);
+        });
+        document.addEventListener('wheel', (event) => {
+          const now = Date.now();
+          if (now - this.lastWheel < 650 || Math.abs(event.deltaY) < 12) return;
+          this.lastWheel = now;
+          this.go(event.deltaY > 0 ? 1 : -1);
+        }, { passive: true });
+        document.addEventListener('touchstart', (event) => {
+          this.touchStartX = event.changedTouches[0].clientX;
+          this.touchStartY = event.changedTouches[0].clientY;
+        }, { passive: true });
+        document.addEventListener('touchend', (event) => {
+          const dx = event.changedTouches[0].clientX - this.touchStartX;
+          const dy = event.changedTouches[0].clientY - this.touchStartY;
+          if (Math.max(Math.abs(dx), Math.abs(dy)) < 45) return;
+          this.go(Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 1 : -1) : (dy < 0 ? 1 : -1));
+        }, { passive: true });
+        this.show(this.current, false);
+      }
+      scaleStage() {
+        const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        const x = (window.innerWidth - 1920 * factor) / 2;
+        const y = (window.innerHeight - 1080 * factor) / 2;
+        this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+      }
+      go(delta) { this.show(this.current + delta); }
+      show(index, updateHash = true) {
+        this.current = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          slide.classList.toggle('active', i === this.current);
+          slide.classList.toggle('visible', i === this.current);
+          slide.setAttribute('aria-hidden', i === this.current ? 'false' : 'true');
+        });
+        const shown = String(this.current + 1).padStart(2, '0');
+        document.getElementById('counter').textContent = `${shown} / ${this.slides.length}`;
+        document.getElementById('progress').style.width = `${((this.current + 1) / this.slides.length) * 100}%`;
+        document.title = `AndesGo · ${shown}/${this.slides.length}`;
+        if (updateHash) history.replaceState(null, '', `#${this.current + 1}`);
+      }
+    }
+
+    /* ===========================================
+       EDITOR INLINE: persistencia local y exportación
+       =========================================== */
+    class InlineEditor {
+      constructor() {
+        this.isActive = false;
+        this.key = 'andesgo-defensa-edits-v1';
+        this.nodes = [...document.querySelectorAll('[data-edit]')];
+        this.toggle = document.getElementById('editToggle');
+        this.toolbar = document.getElementById('editToolbar');
+        this.restore();
+        this.bind();
+      }
+      bind() {
+        this.toggle.addEventListener('click', () => this.toggleMode());
+        document.querySelector('.edit-hotzone').addEventListener('click', () => this.toggleMode());
+        document.addEventListener('keydown', (event) => {
+          const editing = event.target && event.target.getAttribute && event.target.getAttribute('contenteditable') === 'true';
+          if ((event.key === 'e' || event.key === 'E') && !editing) this.toggleMode();
+          if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') { event.preventDefault(); this.save(); }
+        });
+        this.nodes.forEach(node => node.addEventListener('input', () => this.save()));
+        document.getElementById('saveEdits').addEventListener('click', () => this.save());
+        document.getElementById('resetEdits').addEventListener('click', () => { localStorage.removeItem(this.key); location.reload(); });
+        document.getElementById('downloadDeck').addEventListener('click', () => this.download());
+        const hotzone = document.querySelector('.edit-hotzone');
+        let hideTimeout = null;
+        hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); this.toggle.classList.add('show'); });
+        hotzone.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!this.isActive) this.toggle.classList.remove('show'); }, 400); });
+        this.toggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        this.toggle.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => { if (!this.isActive) this.toggle.classList.remove('show'); }, 400); });
+      }
+      toggleMode() {
+        this.isActive = !this.isActive;
+        this.nodes.forEach(node => node.setAttribute('contenteditable', String(this.isActive)));
+        this.toggle.classList.toggle('active', this.isActive);
+        this.toolbar.classList.toggle('active', this.isActive);
+        if (!this.isActive) this.save();
+      }
+      save() {
+        localStorage.setItem(this.key, JSON.stringify(this.nodes.map(node => node.innerHTML)));
+        this.toggle.textContent = '✓';
+        setTimeout(() => this.toggle.textContent = '✎', 700);
+      }
+      restore() {
+        try {
+          const values = JSON.parse(localStorage.getItem(this.key) || 'null');
+          if (Array.isArray(values)) this.nodes.forEach((node, index) => { if (typeof values[index] === 'string') node.innerHTML = values[index]; });
+        } catch (_) { /* Una edición local inválida no impide presentar. */ }
+      }
+      download() {
+        const blob = new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'andesgo-defensa-editada.html';
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
+    }
+
+    window.presentation = new SlidePresentation();
+    window.inlineEditor = new InlineEditor();
+  </script>
+</body>
+</html>

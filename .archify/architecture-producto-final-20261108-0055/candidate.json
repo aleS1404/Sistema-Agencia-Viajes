@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AndesGo — arquitectura del producto final",
+    "subtitle": "Despliegue local Docker, control por roles y 21 casos de uso trazados",
+    "locale": "es",
+    "output": "docs/final/diagramas/arquitectura-interactiva.html",
+    "quality_profile": "showcase",
+    "visual_preset": "editorial",
+    "engineering_profile": "deployment-ownership",
+    "repository": {
+      "url": "https://github.com/aleS1404/Sistema-Agencia-Viajes",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "47eb04effd4f8479dcd8120a177ea0c93f4a2612"
+    },
+    "viewBox": [1116, 720],
+    "views": [
+      {
+        "id": "journey",
+        "label": "Recorrido del cliente",
+        "focus": ["actors", "web", "gateway", "api", "auth", "catalog", "booking", "db"],
+        "note": "Acceso, recomendación, reserva, pago y postventa mediante la API protegida."
+      },
+      {
+        "id": "operations",
+        "label": "Operación y soporte",
+        "focus": ["actors", "web", "api", "support", "booking", "db"],
+        "note": "Atención resuelve cancelaciones, reembolsos y reclamos con auditoría."
+      },
+      {
+        "id": "administration",
+        "label": "Administración local",
+        "focus": ["actors", "web", "api", "catalog", "support", "adminer", "db"],
+        "note": "Administrador gestiona usuarios, políticas, catálogo, reportes y datos de demostración."
+      }
+    ],
+    "legend": {
+      "mode": "all",
+      "entries": {
+        "frontend": { "label": "Interfaz" },
+        "backend": { "label": "Servicio de aplicación" },
+        "database": { "label": "Persistencia" },
+        "cloud": { "label": "Entrada HTTP" },
+        "security": { "label": "Seguridad" },
+        "external": { "label": "Actores" }
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "actors",
+      "type": "external",
+      "label": "Actores del sistema",
+      "sublabel": "4 roles protegidos",
+      "icon": "person",
+      "pos": [10, 320],
+      "size": [142, 76],
+      "sources": [
+        { "path": "apps/web/src/App.tsx", "line": 161, "end_line": 184, "label": "Navegación por rol" }
+      ]
+    },
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "Aplicación AndesGo",
+      "sublabel": "React · Vite · TS :5173",
+      "tag": "UI por rol",
+      "pos": [240, 320],
+      "size": [140, 76],
+      "sources": [
+        { "path": "apps/web/src/App.tsx", "line": 30, "label": "Rutas React" },
+        { "path": "apps/web/src/App.tsx", "line": 161, "end_line": 184, "label": "Menús protegidos" }
+      ]
+    },
+    {
+      "id": "gateway",
+      "type": "cloud",
+      "label": "Nginx",
+      "sublabel": "SPA + proxy /api",
+      "tag": "Equipo AndesGo",
+      "pos": [480, 320],
+      "size": [110, 76],
+      "sources": [
+        { "path": "apps/web/nginx.conf", "line": 14, "label": "Proxy de API" },
+        { "path": "compose.yaml", "line": 66, "end_line": 76, "label": "Servicio web" }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "API NestJS",
+      "sublabel": "REST :3000 · TypeORM",
+      "tag": "Orquestación",
+      "pos": [690, 320],
+      "size": [130, 76],
+      "sources": [
+        { "path": "apps/api/src/app.module.ts", "line": 15, "end_line": 42, "label": "Módulo principal" },
+        { "path": "apps/api/src/domain.controller.ts", "line": 30, "end_line": 50, "label": "Controlador REST" }
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "JWT + RBAC",
+      "sublabel": "Identidad, rol y propiedad",
+      "tag": "PB-21",
+      "pos": [690, 100],
+      "size": [130, 76],
+      "sources": [
+        { "path": "apps/api/src/security.ts", "line": 23, "end_line": 65, "label": "Guards y roles" },
+        { "path": "apps/api/src/auth.service.ts", "line": 91, "end_line": 130, "label": "Identidad y proveedor" }
+      ]
+    },
+    {
+      "id": "catalog",
+      "type": "backend",
+      "label": "Catálogo y recomendación",
+      "sublabel": "Servicios · perfiles · afinidad",
+      "tag": "Sprint 2",
+      "pos": [920, 100],
+      "size": [160, 76],
+      "sources": [
+        { "path": "apps/api/src/domain.controller.ts", "line": 34, "end_line": 96, "label": "Catálogo y proveedor" },
+        { "path": "apps/api/src/domain.service.ts", "line": 85, "label": "Recomendador" }
+      ]
+    },
+    {
+      "id": "booking",
+      "type": "backend",
+      "label": "Reservas y pagos",
+      "sublabel": "Itinerario · transacción",
+      "tag": "Sprint 3",
+      "pos": [920, 320],
+      "size": [160, 76],
+      "sources": [
+        { "path": "apps/api/src/domain.controller.ts", "line": 103, "end_line": 138, "label": "API de reserva" },
+        { "path": "apps/api/src/domain.service.ts", "line": 266, "end_line": 336, "label": "Reserva y pago" }
+      ]
+    },
+    {
+      "id": "support",
+      "type": "backend",
+      "label": "Postventa y gestión",
+      "sublabel": "Reembolsos · reclamos · reportes",
+      "tag": "Sprints 4–5",
+      "pos": [690, 540],
+      "size": [160, 76],
+      "sources": [
+        { "path": "apps/api/src/domain.controller.ts", "line": 138, "end_line": 215, "label": "Postventa y admin" },
+        { "path": "apps/api/src/domain.service.ts", "line": 340, "end_line": 443, "label": "Flujos de soporte" }
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "MySQL 8.4",
+      "sublabel": "19 tablas · datos sintéticos",
+      "tag": "Volumen persistente",
+      "pos": [920, 540],
+      "size": [130, 76],
+      "sources": [
+        { "path": "database/init/001_schema.sql", "line": 4, "end_line": 198, "label": "Esquema base" },
+        { "path": "database/init/003_final_product.sql", "line": 13, "end_line": 46, "label": "Extensión final" },
+        { "path": "compose.yaml", "line": 4, "end_line": 32, "label": "MySQL en Docker" }
+      ]
+    },
+    {
+      "id": "adminer",
+      "type": "frontend",
+      "label": "Adminer",
+      "sublabel": "Tablas locales :8080",
+      "tag": "Equipo AndesGo",
+      "pos": [450, 540],
+      "size": [140, 76],
+      "sources": [
+        { "path": "compose.yaml", "line": 27, "end_line": 38, "label": "Servicio Adminer" }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Docker Compose · equipo local",
+      "wraps": ["web", "gateway", "api", "auth", "catalog", "booking", "support", "db", "adminer"],
+      "pad": 34
+    },
+    {
+      "kind": "security-group",
+      "label": "API protegida",
+      "wraps": ["api", "auth"],
+      "pad": 22
+    },
+    {
+      "kind": "security-group",
+      "label": "Red privada de datos",
+      "wraps": ["db"],
+      "pad": 18
+    }
+  ],
+  "connections": [
+    { "id": "actor-web", "from": "actors", "to": "web", "label": "HTTPS local", "variant": "emphasis" },
+    { "id": "web-gateway", "from": "web", "to": "gateway", "label": "SPA / solicitudes" },
+    { "id": "gateway-api", "from": "gateway", "to": "api", "label": "/api REST", "variant": "emphasis" },
+    { "id": "api-auth", "from": "api", "to": "auth", "label": "verifica JWT y rol", "variant": "security", "fromSide": "top", "toSide": "bottom" },
+    { "id": "api-catalog", "from": "api", "to": "catalog", "label": "catálogo / recomendación" },
+    { "id": "api-booking", "from": "api", "to": "booking", "label": "reserva / pago" },
+    { "id": "api-support", "from": "api", "to": "support", "label": "postventa / reportes" },
+    { "id": "auth-db", "from": "auth", "to": "db", "label": "usuarios y permisos", "variant": "security" },
+    { "id": "catalog-db", "from": "catalog", "to": "db", "label": "SQL" },
+    { "id": "booking-db", "from": "booking", "to": "db", "label": "transacciones SQL", "variant": "emphasis" },
+    { "id": "support-db", "from": "support", "to": "db", "label": "auditoría SQL" },
+    { "id": "adminer-db", "from": "adminer", "to": "db", "label": "consulta local", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Producto ejecutable",
+      "items": ["Cuatro servicios Docker saludables", "Interfaz por rol y 21 casos trazados", "Adminer expone los datos de demostración"]
+    },
+    {
+      "dot": "rose",
+      "title": "Seguridad",
+      "items": ["Contraseñas derivadas con bcrypt", "JWT, RBAC y propiedad del recurso", "Base publicada solo en 127.0.0.1"]
+    },
+    {
+      "dot": "amber",
+      "title": "Alcance académico",
+      "items": ["Pagos y reservas simulados", "Datos exclusivamente sintéticos", "Recomendación basada en contenido"]
+    }
+  ]
+}
