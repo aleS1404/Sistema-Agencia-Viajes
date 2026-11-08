@@ -45,7 +45,7 @@ function listData<T>(payload: T[] | ApiList<T>): T[] {
   return Array.isArray(payload) ? payload : payload.data;
 }
 
-function normalizeService(raw: Record<string, unknown>): Service {
+export function normalizeService(raw: Record<string, unknown>): Service {
   const interests = Array.isArray(raw.interests)
     ? raw.interests
     : String(raw.interests ?? '').split(',').filter(Boolean).map((name, index) => ({ id: index + 1, code: name.trim().toUpperCase(), name: name.trim() }));
@@ -57,6 +57,7 @@ function normalizeService(raw: Record<string, unknown>): Service {
     priceBob: Number(raw.priceBob ?? 0),
     durationDays: Number(raw.durationDays ?? 0),
     capacity: Number(raw.capacity ?? 0),
+    status: String(raw.status ?? 'available') as Service['status'],
     destination: raw.destination && typeof raw.destination === 'object'
       ? raw.destination as Service['destination']
       : { id: Number(raw.destinationId ?? 0), city: String(raw.city ?? 'Bolivia'), department: String(raw.department ?? ''), country: 'Bolivia' },

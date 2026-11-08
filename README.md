@@ -51,6 +51,8 @@ Todas utilizan la contraseña `Demo1234!` y existen únicamente para la presenta
 | Personal de atención | `soporte@andesgo.demo` |
 | Proveedor turístico | `proveedor@andesgo.demo` |
 
+El seed ampliado registra 16 usuarios sintéticos en total: 2 administradores, 9 clientes, 2 integrantes de atención y 3 proveedores. También crea 12 reservas con estados variados, pagos simulados, cancelaciones y 8 reclamos para enriquecer las pantallas de usuarios y reportes. Las cuatro cuentas anteriores continúan siendo las recomendadas para iniciar sesión.
+
 ## Verificación
 
 ### API
@@ -102,7 +104,8 @@ Seleccionar una tabla y pulsar **Seleccionar datos**. Para la defensa conviene m
 
 ## Documentación y entrega
 
-- [Informe final Word](Informe_Final_Sistema_Agencia_Viajes.docx)
+- [Informe final Word actualizado](Informe_Final_Sistema_Agencia_Viajes_Actualizado.docx)
+- [Informe Word anterior](Informe_Final_Sistema_Agencia_Viajes.docx)
 - [Fuente maestra del informe](docs/final/informe-final.md)
 - [Plan de trabajo](docs/plan-trabajo-segunda-presentacion.md)
 - [Matriz de los 21 casos](docs/final/trazabilidad/matriz-casos-pruebas.md)

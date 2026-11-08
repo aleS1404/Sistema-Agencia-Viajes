@@ -326,13 +326,16 @@ def build() -> Path:
     doc.add_heading("ANEXO C — EVIDENCIA DE INTERFAZ", level=1)
     intro = doc.add_paragraph(
         "Las siguientes capturas corresponden a la aplicación integrada y documentan "
-        "el acceso, la vista administrativa y la consulta del catálogo por el cliente."
+        "el acceso, la gestión de usuarios, los indicadores administrativos, el catálogo "
+        "y las recomendaciones explicables del cliente."
     )
     intro.paragraph_format.first_line_indent = Cm(1.27)
     evidence = [
         ("pantalla-acceso.png", "Figura C.1. Pantalla de acceso del sistema.", Inches(6.2)),
         ("panel-administrador.png", "Figura C.2. Panel principal del administrador.", Inches(6.2)),
-        ("catalogo-cliente.png", "Figura C.3. Catálogo disponible para el cliente.", Inches(5.0)),
+        ("usuarios-administrador.png", "Figura C.3. Gestión administrativa de usuarios.", Inches(5.0)),
+        ("catalogo-cliente.png", "Figura C.4. Catálogo disponible para el cliente.", Inches(5.0)),
+        ("recomendaciones-cliente.png", "Figura C.5. Recomendaciones explicables del cliente.", Inches(5.0)),
     ]
     for file_name, caption_text, width in evidence:
         image_path = INTERFACE_EVIDENCE / file_name
@@ -358,8 +361,13 @@ def build() -> Path:
         "Salazar Gisberth Alexandra Cristal"
     )
     doc.core_properties.keywords = "Scrum, turismo, NestJS, React, MySQL, UML, Docker"
-    doc.save(OUTPUT)
-    return OUTPUT
+    try:
+        doc.save(OUTPUT)
+        return OUTPUT
+    except PermissionError:
+        fallback = OUTPUT.with_name(f"{OUTPUT.stem}_Actualizado{OUTPUT.suffix}")
+        doc.save(fallback)
+        return fallback
 
 
 if __name__ == "__main__":

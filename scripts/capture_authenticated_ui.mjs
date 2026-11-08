@@ -9,8 +9,10 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--disable-gpu'],
 });
 
-async function loginAndCapture(email, route, output) {
+async function loginAndCapture(email, route, output, expectedSelector = '.app-shell') {
   const page = await browser.newPage();
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
   await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle0' });
   await page.evaluate(() => localStorage.clear());
@@ -23,6 +25,8 @@ async function loginAndCapture(email, route, output) {
     page.click('form button[type="submit"], form button'),
   ]);
   await page.goto(`http://127.0.0.1:5173${route}`, { waitUntil: 'networkidle0' });
+  await page.waitForSelector(expectedSelector, { timeout: 15000 });
+  if (pageErrors.length) throw new Error(`Error de navegador en ${route}: ${pageErrors.join(' | ')}`);
   await page.screenshot({ path: output, fullPage: true });
   await page.close();
 }
@@ -34,9 +38,21 @@ try {
     'docs/final/evidencias/panel-administrador.png',
   );
   await loginAndCapture(
+    'admin@andesgo.demo',
+    '/admin/usuarios',
+    'docs/final/evidencias/usuarios-administrador.png',
+    'tbody tr',
+  );
+  await loginAndCapture(
     'cliente@andesgo.demo',
     '/catalogo',
     'docs/final/evidencias/catalogo-cliente.png',
+  );
+  await loginAndCapture(
+    'cliente@andesgo.demo',
+    '/recomendaciones',
+    'docs/final/evidencias/recomendaciones-cliente.png',
+    '.service-card',
   );
   process.stdout.write('Capturas autenticadas creadas.\n');
 } finally {

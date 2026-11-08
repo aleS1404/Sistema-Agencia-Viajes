@@ -102,6 +102,9 @@ export interface ReportSummary {
   cancellations: number;
   openComplaints: number;
   activeServices: number;
+  totalUsers: number;
+  activeUsers: number;
+  usersByRole: Partial<Record<Role, number>>;
   recentBookings?: Array<{ date: string; total: number }>;
   topServices?: Array<{ name: string; bookings: number }>;
 }

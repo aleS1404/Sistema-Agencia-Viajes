@@ -93,16 +93,21 @@ export class DomainService {
     const interestIds = new Set(selected.map((row) => Number(row.interest_id)));
     const rows = (await this.db.query(
       `SELECT s.id, s.code, s.name, s.description, s.duration_days AS durationDays,
-              s.price_bob AS priceBob, d.city, c.name AS category,
+              s.price_bob AS priceBob, s.capacity, s.status,
+              d.id AS destinationId, d.city, d.department, d.country,
+              c.id AS categoryId, c.name AS category,
+              p.id AS providerId, p.trade_name AS provider,
               GROUP_CONCAT(DISTINCT si.interest_id ORDER BY si.interest_id) AS interestIds,
               GROUP_CONCAT(DISTINCT i.name ORDER BY i.name SEPARATOR ', ') AS interests
        FROM tourist_services s
+       JOIN providers p ON p.id = s.provider_id
        JOIN destinations d ON d.id = s.destination_id
        JOIN service_categories c ON c.id = s.category_id
        LEFT JOIN service_interests si ON si.service_id = s.id
        LEFT JOIN interests i ON i.id = si.interest_id
        WHERE s.status = 'available'
-       GROUP BY s.id, s.code, s.name, s.description, s.duration_days, s.price_bob, d.city, c.name`,
+       GROUP BY s.id, s.code, s.name, s.description, s.duration_days, s.price_bob, s.capacity, s.status,
+                d.id, d.city, d.department, d.country, c.id, c.name, p.id, p.trade_name`,
     )) as Array<Row & { durationDays: number; priceBob: string; interestIds: string | null }>;
 
     return rows
@@ -466,7 +471,7 @@ export class DomainService {
   }
 
   async report(): Promise<Record<string, unknown>> {
-    const [bookings, payments, cancellations, complaints, popular] = await Promise.all([
+    const [bookings, payments, cancellations, complaints, popular, users] = await Promise.all([
       this.db.query('SELECT status, COUNT(*) AS total, SUM(total_amount) AS amount FROM bookings GROUP BY status'),
       this.db.query('SELECT status, COUNT(*) AS total, SUM(amount) AS amount FROM payments GROUP BY status'),
       this.db.query('SELECT status, COUNT(*) AS total FROM cancellations GROUP BY status'),
@@ -475,6 +480,11 @@ export class DomainService {
         `SELECT s.id, s.name, SUM(bi.quantity) AS reservations
          FROM booking_items bi JOIN tourist_services s ON s.id = bi.service_id
          GROUP BY s.id, s.name ORDER BY reservations DESC LIMIT 5`,
+      ),
+      this.db.query(
+        `SELECT r.code AS role, u.status, COUNT(*) AS total
+         FROM app_users u JOIN roles r ON r.id = u.role_id
+         GROUP BY r.code, u.status ORDER BY r.code, u.status`,
       ),
     ]);
     const bookingCount = bookings.reduce((sum: number, row: Row) => sum + Number(row.total ?? 0), 0);
@@ -488,6 +498,15 @@ export class DomainService {
     const openComplaints = complaints
       .filter((row: Row) => ['open', 'in_progress'].includes(String(row.status)))
       .reduce((sum: number, row: Row) => sum + Number(row.total ?? 0), 0);
+    const totalUsers = users.reduce((sum: number, row: Row) => sum + Number(row.total ?? 0), 0);
+    const activeUsers = users
+      .filter((row: Row) => String(row.status) === 'active')
+      .reduce((sum: number, row: Row) => sum + Number(row.total ?? 0), 0);
+    const usersByRole = (users as Row[]).reduce((summary: Record<string, number>, row: Row) => {
+      const role = String(row.role);
+      summary[role] = (summary[role] ?? 0) + Number(row.total ?? 0);
+      return summary;
+    }, {});
     const activeRows = (await this.db.query("SELECT COUNT(*) AS total FROM tourist_services WHERE status = 'available'")) as Row[];
     return {
       generatedAt: new Date().toISOString(),
@@ -497,8 +516,11 @@ export class DomainService {
       cancellations: cancellationCount,
       openComplaints,
       activeServices: Number(activeRows[0]?.total ?? 0),
+      totalUsers,
+      activeUsers,
+      usersByRole,
       topServices: popular.map((row: Row) => ({ name: row.name, bookings: Number(row.reservations ?? 0) })),
-      detail: { bookings, payments, cancellations, complaints },
+      detail: { bookings, payments, cancellations, complaints, users },
     };
   }
 

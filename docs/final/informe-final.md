@@ -182,7 +182,7 @@ El modelo final contiene 19 tablas. A las 17 tablas iniciales se añadieron `pro
 
 ### 3.14 Pruebas
 
-La matriz de trazabilidad relaciona cada caso con su endpoint, datos, prueba y evidencia. Jest aprobó 1 de 1 pruebas de API; Vitest aprobó 1 de 1 pruebas web; ambas compilaciones aprobaron. El recorrido integrado verificó los 21 casos. El cliente recibió 403 al intentar reportes administrativos.
+La matriz de trazabilidad relaciona cada caso con su endpoint, datos, prueba y evidencia. Jest aprobó 1 de 1 pruebas de API; Vitest aprobó 2 de 2 pruebas web; ambas compilaciones aprobaron. El verificador integral aprobó 11 de 11 recorridos que cubren los flujos principales, mientras los 21 casos permanecen trazados en la matriz. El cliente recibió 403 al intentar reportes administrativos.
 
 ### 3.15 Desarrollo del programa
 
@@ -190,9 +190,9 @@ El repositorio organiza base, backend, frontend, documentación y Docker. El man
 
 ### 3.16 Resultados de integración y limitaciones
 
-El producto integrado utiliza 19 tablas, 12 servicios sintéticos y cuatro cuentas de demostración. El recorrido comprobó reserva, pago aprobado, reembolso aprobado, reclamo resuelto, seis servicios del proveedor, reportes y auditoría. La auditoría registró 16 eventos durante la verificación.
+El producto integrado utiliza 19 tablas, 12 servicios sintéticos y 16 cuentas de demostración: dos administradores, nueve clientes, dos integrantes de atención y tres proveedores. El conjunto demostrativo incorpora 12 reservas base con estados variados, pagos, cancelaciones y ocho reclamos, además de los registros generados por las verificaciones integrales. El panel administrativo presenta totales de usuarios, distribución por rol, reservas, importes y servicios más solicitados.
 
-La cobertura automatizada es mínima: una prueba Jest y una prueba Vitest. El Anexo C conserva capturas de la pantalla de acceso, el panel administrador y el catálogo del cliente. `npm audit` no reportó vulnerabilidades en la web; la API conserva tres vulnerabilidades moderadas transitivas asociadas a TypeORM. La alerta alta de Multer fue eliminada mediante una versión corregida. Los pagos, disponibilidad y datos siguen siendo simulados y no deben presentarse como operación real.
+La cobertura automatizada sigue siendo acotada: una prueba Jest, dos pruebas Vitest y un verificador integral de 11 pasos. El Anexo C conserva capturas del acceso, reportes, administración de usuarios, catálogo y recomendaciones del cliente. `npm audit` no reportó vulnerabilidades en la web; la API conserva tres vulnerabilidades moderadas transitivas asociadas a TypeORM. La alerta alta de Multer fue eliminada mediante una versión corregida. Los pagos, disponibilidad y datos siguen siendo simulados y no deben presentarse como operación real.
 
 ## Bibliografía
 

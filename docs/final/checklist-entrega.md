@@ -24,7 +24,7 @@ Fecha de verificación: 8 de noviembre de 2026.
 ## Documentos y defensa
 
 - [x] Informe final Word generado desde una fuente reproducible.
-- [x] Informe validado como DOCX y con 38 imágenes embebidas.
+- [x] Informe actualizado validado como DOCX y con 40 imágenes embebidas.
 - [x] Manual de instalación.
 - [x] Manual de usuario.
 - [x] Guion de demostración.

@@ -231,11 +231,12 @@ function ErrorState({ error, retry }: { error: string; retry?: () => void }) {
   return <div className="state-card error"><MessageSquareWarning /><h3>No pudimos cargar esta sección</h3><p>{error}</p>{retry && <button className="btn btn-secondary" onClick={retry}>Reintentar</button>}</div>;
 }
 
-function StatusPill({ value }: { value: string }) {
-  const normalized = value.toLowerCase();
+function StatusPill({ value }: { value?: unknown }) {
+  const label = typeof value === 'string' && value.trim() ? value : 'sin estado';
+  const normalized = label.toLowerCase();
   const positive = ['active', 'available', 'approved', 'confirmed', 'completed', 'resolved'].includes(normalized);
   const warning = ['pending', 'draft', 'in_progress', 'open', 'requested'].includes(normalized);
-  return <span className={`status-pill ${positive ? 'positive' : warning ? 'warning' : 'neutral'}`}>{value.replaceAll('_', ' ')}</span>;
+  return <span className={`status-pill ${positive ? 'positive' : warning ? 'warning' : 'neutral'}`}>{label.replaceAll('_', ' ')}</span>;
 }
 
 function useRemote<T>(load: () => Promise<T>, dependencies: unknown[] = []) {
@@ -416,9 +417,13 @@ function ReportsPage() {
   const remote = useRemote<ReportSummary>(api.reportSummary, []);
   const metrics = remote.data ? [
     ['Reservas', remote.data.bookings, <CalendarDays />], ['Confirmadas', remote.data.confirmedBookings, <CheckCircle2 />], ['Importe registrado', money(remote.data.totalRevenueBob), <CircleDollarSign />], ['Cancelaciones', remote.data.cancellations, <X />], ['Reclamos abiertos', remote.data.openComplaints, <MessageSquareWarning />], ['Servicios activos', remote.data.activeServices, <Store />],
+    ['Usuarios', remote.data.totalUsers, <UsersRound />], ['Usuarios activos', remote.data.activeUsers, <UserRound />],
   ] : [];
   const max = Math.max(1, ...(remote.data?.topServices?.map((s) => s.bookings) || [1]));
-  return <><PageHeader eyebrow="Analítica descriptiva" title="Reportes del prototipo" description="Indicadores calculados sobre datos sintéticos; no representan ingresos reales." />{remote.loading ? <LoadingState /> : remote.error ? <ErrorState error={remote.error} retry={remote.refresh} /> : remote.data && <><section className="metric-grid">{metrics.map(([label, value, icon]) => <article className="metric-card" key={String(label)}><span>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></article>)}</section><section className="panel section-space"><h2>Servicios más reservados</h2>{remote.data.topServices?.length ? <div className="bar-list">{remote.data.topServices.map((s) => <div key={s.name}><div><strong>{s.name}</strong><span>{s.bookings}</span></div><span className="bar-track"><span style={{ width: `${(s.bookings / max) * 100}%` }} /></span></div>)}</div> : <p className="muted">Aún no hay reservas suficientes para este reporte.</p>}</section></>}</>;
+  const roleEntries = Object.entries(remote.data?.usersByRole || {});
+  const maxRole = Math.max(1, ...roleEntries.map(([, total]) => total));
+  const roleNames: Record<string, string> = { ADMIN: 'Administradores', CUSTOMER: 'Clientes', SUPPORT: 'Atención', PROVIDER: 'Proveedores' };
+  return <><PageHeader eyebrow="Analítica descriptiva" title="Reportes del prototipo" description="Indicadores calculados sobre datos sintéticos; no representan ingresos reales." />{remote.loading ? <LoadingState /> : remote.error ? <ErrorState error={remote.error} retry={remote.refresh} /> : remote.data && <><section className="metric-grid">{metrics.map(([label, value, icon]) => <article className="metric-card" key={String(label)}><span>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></article>)}</section><div className="split-layout section-space"><section className="panel"><h2>Servicios más reservados</h2>{remote.data.topServices?.length ? <div className="bar-list">{remote.data.topServices.map((s) => <div key={s.name}><div><strong>{s.name}</strong><span>{s.bookings}</span></div><span className="bar-track"><span style={{ width: `${(s.bookings / max) * 100}%` }} /></span></div>)}</div> : <p className="muted">Aún no hay reservas suficientes para este reporte.</p>}</section><section className="panel"><h2>Usuarios por rol</h2>{roleEntries.length ? <div className="bar-list">{roleEntries.map(([role, total]) => <div key={role}><div><strong>{roleNames[role] || role}</strong><span>{total}</span></div><span className="bar-track"><span style={{ width: `${(total / maxRole) * 100}%` }} /></span></div>)}</div> : <p className="muted">No hay usuarios registrados.</p>}</section></div></>}</>;
 }
 
 function NotAllowed() { return <ErrorState error="Tu rol no tiene permiso para acceder a esta sección." />; }
