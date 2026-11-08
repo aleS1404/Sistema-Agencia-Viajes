@@ -9,7 +9,7 @@ El informe actual termina el Marco Aplicativo en 3.16. La incorporación correct
 | **3.17 Dashboard administrativo y analítica predictiva** | objetivo, filtros, KPI, arquitectura, fórmula de regresión, resultados y limitaciones | `dashboard-predictivo.md`, captura del panel y arquitectura HTML |
 | **3.18 Asistente administrativo basado en intenciones** | intenciones, flujo, seguridad, decisión de no usar API externa y alcance | `chatbot-administrativo.md`, captura del asistente y arquitectura HTML |
 | **3.19 Indicador de riesgo de cancelación** | variables, pesos, umbrales, explicación, ética y revisión humana | `riesgo-cancelacion.md`, tabla visible en el dashboard y arquitectura HTML |
-| **3.20 Mejora visual del catálogo** | estrategia de imágenes SVG locales, accesibilidad, carga diferida y relación con catálogo/recomendación | capturas de catálogo y recomendaciones |
+| **3.20 Mejora visual del catálogo** | fotografías reales locales, créditos/licencias, accesibilidad, carga diferida y relación con catálogo/recomendación | capturas de catálogo, recomendaciones y `creditos-imagenes.md` |
 | **Anexo C — Evidencia visual** | capturas actualizadas del dashboard, asistente, usuarios, catálogo y recomendaciones | `docs/final/evidencias` |
 | **Anexo D — Arquitecturas interactivas** | enlaces o archivos HTML exportables de Archify | `docs/final/ia/arquitecturas` |
 

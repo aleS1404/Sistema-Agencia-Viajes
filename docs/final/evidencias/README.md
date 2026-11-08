@@ -10,3 +10,5 @@ Capturas obtenidas de la aplicación integrada el 8 de noviembre de 2026:
 6. `recomendaciones-cliente.png`: recomendaciones personalizadas con explicación e imágenes.
 
 Las imágenes se incorporan automáticamente al Anexo C mediante `scripts/generate_informe_final.py`.
+
+Los autores, licencias y vínculos de las fotografías reales del catálogo están documentados en `creditos-imagenes.md`.

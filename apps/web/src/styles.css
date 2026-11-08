@@ -142,6 +142,8 @@ legend { padding: 0 .4rem; font-weight: 800; }
 .service-card:hover .service-image img { transform: scale(1.035); }
 .service-image span { z-index: 1; font-weight: 800; text-shadow: 0 1px 8px rgba(0,0,0,.55); }
 .service-image svg { z-index: 1; width: 46px; height: 46px; opacity: .8; }
+.service-credit { position: absolute; z-index: 2; top: .6rem; right: .65rem; border-radius: 999px; padding: .3rem .55rem; color: #fff; background: rgba(7, 31, 23, .72); font-size: .66rem; font-weight: 750; text-decoration: none; backdrop-filter: blur(5px); }
+.service-credit:hover { background: rgba(7, 31, 23, .92); text-decoration: underline; }
 .service-body { padding: 1.15rem; }
 .service-body h3 { margin: .6rem 0 .5rem; }
 .service-body p { display: -webkit-box; overflow: hidden; color: var(--muted); font-size: .9rem; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }

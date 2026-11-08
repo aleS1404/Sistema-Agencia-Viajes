@@ -282,14 +282,22 @@ function HomePage({ user }: { user: User }) {
   );
 }
 
+const destinationPhotos: Record<string, { file: string; source: string }> = {
+  'la-paz': { file: '/destinations/la-paz.jpg', source: 'https://commons.wikimedia.org/wiki/File:Illimani_La_Paz.jpg' },
+  copacabana: { file: '/destinations/copacabana.jpg', source: 'https://commons.wikimedia.org/wiki/File:Copacabana_Titicaca.jpg' },
+  coroico: { file: '/destinations/coroico.jpg', source: 'https://commons.wikimedia.org/wiki/File:Coroico_vista_parcial_(La_Paz_-_Bolivia).jpg' },
+};
+
 function ServiceCard({ service, selected, onCompare, onReserve }: { service: Service; selected?: boolean; onCompare?: () => void; onReserve?: () => void }) {
   const city = service.destination?.city || 'Bolivia';
   const imageKey = city.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/(^-|-$)/g, '');
+  const photo = destinationPhotos[imageKey];
   return (
     <article className={`service-card ${selected ? 'selected' : ''}`}>
       <div className="service-image">
-        <img src={`/destinations/${['la-paz', 'copacabana', 'coroico'].includes(imageKey) ? imageKey : 'default'}.svg`} alt={`Paisaje ilustrado de ${city}`} loading="lazy" />
+        <img src={photo?.file || '/destinations/default.svg'} alt={`Vista turística de ${city}`} loading="lazy" />
         <span>{city}</span><Compass />
+        {photo && <a className="service-credit" href={photo.source} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>Foto y licencia</a>}
       </div>
       <div className="service-body">
         <div className="service-meta"><span>{service.category?.name || 'Servicio'}</span><StatusPill value={service.status} /></div>

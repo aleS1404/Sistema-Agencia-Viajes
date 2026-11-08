@@ -143,7 +143,7 @@ No se marcará un caso como terminado sin captura o resultado verificable, prueb
 
 **Backlog seleccionado:** PB-03, PB-04, PB-13, PB-16 y PB-17.
 
-**Desarrollo:** CRUD de proveedores, destinos, categorías y servicios; flujo de propuesta del proveedor; búsqueda y comparación; recomendación por intereses, presupuesto y duración; explicación del resultado; ilustraciones SVG locales, accesibles y con carga diferida para La Paz, Copacabana y Coroico.
+**Desarrollo:** CRUD de proveedores, destinos, categorías y servicios; flujo de propuesta del proveedor; búsqueda y comparación; recomendación por intereses, presupuesto y duración; explicación del resultado; fotografías reales locales, accesibles, con carga diferida y atribución para La Paz, Copacabana y Coroico.
 
 **Diagramas:**
 

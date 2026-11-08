@@ -24,6 +24,8 @@ python scripts/generate_informe_final.py
 
 El resultado se crea como `Informe_Final_Sistema_Agencia_Viajes.docx`. Si ese archivo está abierto en Word, el generador conserva la copia abierta y crea `Informe_Final_Sistema_Agencia_Viajes_Actualizado.docx`. El archivo histórico `Marco_Aplicativo_Capitulo_III.docx` no se modifica.
 
+La copia `Informe_Final_Sistema_Agencia_Viajes_Con_Fotografias.docx` incorpora las capturas del catálogo con fotografías reales y los créditos/licencias documentados en `docs/final/evidencias/creditos-imagenes.md`.
+
 ## Verificación reproducible
 
 ```powershell

@@ -146,7 +146,7 @@ Selecciona PB-01, PB-02, PB-12 y PB-21. Produce acceso, perfil, permisos, audito
 
 ### 3.5 Sprint 2 — Catálogo y recomendación
 
-Selecciona PB-03, PB-04, PB-13, PB-16 y PB-17. Produce catálogo, búsqueda, comparación y recomendación explicable. Las tarjetas incorporan ilustraciones SVG locales para La Paz, Copacabana y Coroico, texto alternativo y carga diferida. **Resultado verificado:** 12 servicios disponibles mediante el proxy web, cinco recomendaciones y seis servicios asociados a la cuenta proveedor.
+Selecciona PB-03, PB-04, PB-13, PB-16 y PB-17. Produce catálogo, búsqueda, comparación y recomendación explicable. Las tarjetas incorporan fotografías reales descargadas desde Wikimedia Commons para La Paz, Copacabana y Coroico, texto alternativo, carga diferida y vínculos a su licencia. **Resultado verificado:** 12 servicios disponibles mediante el proxy web, cinco recomendaciones y seis servicios asociados a la cuenta proveedor.
 
 ### 3.6 Sprint 3 — Reserva y pago
 
@@ -210,7 +210,7 @@ Las reservas pendientes o confirmadas se evalúan con reglas ponderadas visibles
 
 ### 3.20 Mejora visual del catálogo
 
-El catálogo y las recomendaciones muestran ilustraciones SVG locales de La Paz, Copacabana y Coroico. Los archivos se sirven junto con la SPA, no consumen una API de imágenes, incluyen texto alternativo y usan carga diferida. Esta tarea pertenece al Sprint 2 y amplía PB-03 y PB-04 sin alterar los 21 casos de uso.
+El catálogo y las recomendaciones muestran fotografías reales de La Paz, Copacabana y Coroico descargadas desde Wikimedia Commons. Los archivos se sirven localmente junto con la SPA, incluyen texto alternativo, carga diferida y un enlace visible hacia la ficha original y su licencia. La Paz utiliza una fotografía de EEJCC bajo CC BY-SA 4.0; Copacabana, una obra de Entropy1963 en dominio público; y Coroico, una fotografía de Phil Whitehouse bajo CC BY 2.0. Los créditos completos se conservan en `docs/final/evidencias/creditos-imagenes.md`. Esta tarea pertenece al Sprint 2 y amplía PB-03 y PB-04 sin alterar los 21 casos de uso.
 
 La arquitectura detallada de los tres módulos se entrega como HTML interactivo en `docs/final/ia/arquitecturas`; la documentación técnica y la ubicación por sprint se conservan en `docs/final/ia`.
 
