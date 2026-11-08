@@ -146,7 +146,7 @@ Selecciona PB-01, PB-02, PB-12 y PB-21. Produce acceso, perfil, permisos, audito
 
 ### 3.5 Sprint 2 — Catálogo y recomendación
 
-Selecciona PB-03, PB-04, PB-13, PB-16 y PB-17. Produce catálogo, búsqueda, comparación y recomendación explicable. **Resultado verificado:** 12 servicios disponibles mediante el proxy web, cinco recomendaciones y seis servicios asociados a la cuenta proveedor.
+Selecciona PB-03, PB-04, PB-13, PB-16 y PB-17. Produce catálogo, búsqueda, comparación y recomendación explicable. Las tarjetas incorporan ilustraciones SVG locales para La Paz, Copacabana y Coroico, texto alternativo y carga diferida. **Resultado verificado:** 12 servicios disponibles mediante el proxy web, cinco recomendaciones y seis servicios asociados a la cuenta proveedor.
 
 ### 3.6 Sprint 3 — Reserva y pago
 
@@ -154,11 +154,11 @@ Selecciona PB-05, PB-06, PB-07, PB-10 y PB-18. Produce reserva, itinerario, esta
 
 ### 3.7 Sprint 4 — Postventa
 
-Selecciona PB-08, PB-09, PB-11, PB-19 y PB-20. Produce cancelación, reembolso y reclamos. **Resultado verificado:** solicitud y aprobación de reembolso, además de reclamo con estado final `resolved`.
+Selecciona PB-08, PB-09, PB-11, PB-19 y PB-20. Produce cancelación, reembolso, reclamos e indicador preventivo explicable. **Resultado verificado:** solicitud y aprobación de reembolso, reclamo con estado final `resolved` y reservas activas clasificadas por riesgo.
 
 ### 3.8 Sprint 5 — Políticas, reportes y cierre
 
-Selecciona PB-14 y PB-15, y ejecuta regresión sobre PB-01 a PB-21. Produce políticas, reportes, integración e instalación. **Resultado verificado:** política comercial inicial, reporte de tres reservas, Docker con base y API saludables, web HTTP 200 y Adminer activo.
+Selecciona PB-14 y PB-15, y ejecuta regresión sobre PB-01 a PB-21. Produce políticas, dashboard predictivo, asistente administrativo, integración e instalación. **Resultado verificado:** ocho KPI, estimación de demanda, alertas, riesgo visible, respuestas por intención, Docker con base y API saludables, web HTTP 200 y Adminer activo.
 
 ### 3.9 Sprint Review
 
@@ -182,7 +182,7 @@ El modelo final contiene 19 tablas. A las 17 tablas iniciales se añadieron `pro
 
 ### 3.14 Pruebas
 
-La matriz de trazabilidad relaciona cada caso con su endpoint, datos, prueba y evidencia. Jest aprobó 1 de 1 pruebas de API; Vitest aprobó 2 de 2 pruebas web; ambas compilaciones aprobaron. El verificador integral aprobó 11 de 11 recorridos que cubren los flujos principales, mientras los 21 casos permanecen trazados en la matriz. El cliente recibió 403 al intentar reportes administrativos.
+La matriz de trazabilidad relaciona cada caso con su endpoint, datos, prueba y evidencia. Jest aprobó 1 de 1 pruebas de API; Vitest aprobó 2 de 2 pruebas web; ambas compilaciones aprobaron. El verificador integral aprobó 13 de 13 recorridos que cubren los flujos principales, dashboard, predicción, asistente y seguridad, mientras los 21 casos permanecen trazados en la matriz. El cliente recibió 403 al intentar recursos administrativos.
 
 ### 3.15 Desarrollo del programa
 
@@ -192,7 +192,27 @@ El repositorio organiza base, backend, frontend, documentación y Docker. El man
 
 El producto integrado utiliza 19 tablas, 12 servicios sintéticos y 16 cuentas de demostración: dos administradores, nueve clientes, dos integrantes de atención y tres proveedores. El conjunto demostrativo incorpora 12 reservas base con estados variados, pagos, cancelaciones y ocho reclamos, además de los registros generados por las verificaciones integrales. El panel administrativo presenta totales de usuarios, distribución por rol, reservas, importes y servicios más solicitados.
 
-La cobertura automatizada sigue siendo acotada: una prueba Jest, dos pruebas Vitest y un verificador integral de 11 pasos. El Anexo C conserva capturas del acceso, reportes, administración de usuarios, catálogo y recomendaciones del cliente. `npm audit` no reportó vulnerabilidades en la web; la API conserva tres vulnerabilidades moderadas transitivas asociadas a TypeORM. La alerta alta de Multer fue eliminada mediante una versión corregida. Los pagos, disponibilidad y datos siguen siendo simulados y no deben presentarse como operación real.
+La cobertura automatizada sigue siendo acotada: una prueba Jest, dos pruebas Vitest y un verificador integral de 13 pasos. El Anexo C conserva capturas del acceso, dashboard, asistente, administración de usuarios, catálogo y recomendaciones del cliente. `npm audit` no reportó vulnerabilidades en la web; la API conserva tres vulnerabilidades moderadas transitivas asociadas a TypeORM. La alerta alta de Multer fue eliminada mediante una versión corregida. Los pagos, disponibilidad y datos siguen siendo simulados y no deben presentarse como operación real.
+
+### 3.17 Dashboard administrativo y analítica predictiva
+
+El dashboard disponible en `/admin/reportes` permite filtrar por periodo, destino, estado y horizonte de siete, catorce o treinta días. La API agrega reservas, pagos, cancelaciones, reclamos, servicios y usuarios para producir ocho KPI, distribución de estados, servicios principales y alertas. El acceso exige JWT y rol `ADMIN`.
+
+La proyección aplica regresión lineal simple sobre la cantidad diaria de reservas de hasta sesenta días. La pendiente se obtiene mediante `m = (n·Σxy − Σx·Σy) / (n·Σx² − (Σx)²)` y los valores futuros se limitan a cero como mínimo. El ingreso proyectado multiplica la demanda estimada por el ticket promedio del periodo. La confianza mostrada es orientativa y combina ajuste y cantidad de días con observaciones; no constituye una probabilidad certificada. La interfaz declara expresamente que se trata de una estimación académica con datos sintéticos.
+
+### 3.18 Asistente administrativo basado en intenciones
+
+El asistente de `/admin/asistente` reconoce intenciones auditables para reservas, ingresos, usuarios, reclamos, servicio principal, destino principal y riesgo. El backend normaliza el mensaje, selecciona consultas predefinidas y responde con texto, datos estructurados y enlaces internos. No ejecuta SQL ingresado por el usuario, no realiza cambios y no utiliza una API generativa externa. Esta decisión mantiene reproducibilidad, privacidad y costo cero durante la defensa.
+
+### 3.19 Indicador de riesgo de cancelación
+
+Las reservas pendientes o confirmadas se evalúan con reglas ponderadas visibles: reserva pendiente, ausencia de pago aprobado, cancelaciones anteriores, reclamos, importe elevado, salida próxima o anticipación prolongada. El puntaje se limita a 100 y se clasifica como bajo, medio o alto. El modelo devuelve los factores usados y solo prioriza una revisión humana; nunca cancela ni rechaza automáticamente. Al utilizar datos sintéticos, sus pesos no deben considerarse validados para producción.
+
+### 3.20 Mejora visual del catálogo
+
+El catálogo y las recomendaciones muestran ilustraciones SVG locales de La Paz, Copacabana y Coroico. Los archivos se sirven junto con la SPA, no consumen una API de imágenes, incluyen texto alternativo y usan carga diferida. Esta tarea pertenece al Sprint 2 y amplía PB-03 y PB-04 sin alterar los 21 casos de uso.
+
+La arquitectura detallada de los tres módulos se entrega como HTML interactivo en `docs/final/ia/arquitecturas`; la documentación técnica y la ubicación por sprint se conservan en `docs/final/ia`.
 
 ## Bibliografía
 

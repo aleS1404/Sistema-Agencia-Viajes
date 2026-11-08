@@ -13,3 +13,5 @@
 | Diagramas | VALIDADO | diagramas/modelos-preliminares.md |
 | Limitaciones | DOCUMENTADO | Datos sintéticos; la recomendación no usa un servicio externo de IA. |
 
+**Mejora final incorporada:** las tarjetas de catálogo y recomendación muestran ilustraciones SVG locales para La Paz, Copacabana y Coroico, con texto alternativo y carga diferida. La mejora corresponde a PB-03 y PB-04 y no agrega un caso de uso.
+

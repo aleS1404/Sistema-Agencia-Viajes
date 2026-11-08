@@ -189,6 +189,28 @@ try {
         $script:context.reportGeneratedAt = $report.generatedAt
     }
 
+    Run-Step 'Dashboard, predicción y riesgo de cancelación' {
+        $dashboard = Invoke-Api -Method GET -Path '/admin/dashboard?forecastDays=7' -Token $script:context.admin.accessToken
+        Assert-That ([bool]$dashboard.generatedAt) 'El dashboard no tiene fecha de generación'
+        Assert-That ($null -ne $dashboard.kpis.totalUsers) 'El dashboard no incluye KPI de usuarios'
+        Assert-That (@($dashboard.forecast.points).Count -eq 7) 'La predicción no devolvió los 7 días solicitados'
+        Assert-That ([bool]$dashboard.forecast.disclaimer) 'La predicción no comunica su alcance académico'
+        Assert-That ($null -ne $dashboard.cancellationRisks) 'El dashboard no incluye el indicador de riesgo'
+        $script:context.dashboardGeneratedAt = $dashboard.generatedAt
+        $script:context.forecastPoints = @($dashboard.forecast.points).Count
+        $script:context.riskCount = @($dashboard.cancellationRisks).Count
+    }
+
+    Run-Step 'Asistente administrativo por intenciones' {
+        $assistant = Invoke-Api -Method POST -Path '/admin/assistant' -Token $script:context.admin.accessToken -Body @{
+            message = '¿Cuántos reclamos están abiertos?'
+        }
+        Assert-That ($assistant.intent -eq 'open_complaints') 'El asistente no reconoció la intención de reclamos'
+        Assert-That ([bool]$assistant.answer) 'El asistente no devolvió respuesta'
+        Assert-That ($assistant.mode -like '*datos del sistema*') 'El asistente no declaró su modo de operación'
+        $script:context.assistantIntent = $assistant.intent
+    }
+
     Run-Step 'Denegación RBAC para cliente' {
         $headers = @{ Authorization = "Bearer $($script:context.customer.accessToken)" }
         $statusCode = 0
@@ -230,6 +252,10 @@ $summary = [ordered]@{
         complaintId = $script:context.complaint.id
         providerServiceId = $script:context.providerService.id
         reportGeneratedAt = $script:context.reportGeneratedAt
+        dashboardGeneratedAt = $script:context.dashboardGeneratedAt
+        forecastPoints = $script:context.forecastPoints
+        cancellationRiskCount = $script:context.riskCount
+        assistantIntent = $script:context.assistantIntent
     }
     steps = $script:steps
 }

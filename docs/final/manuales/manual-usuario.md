@@ -1,6 +1,6 @@
 # Manual de usuario
 
-**Estado:** recorridos funcionales validados; capturas visuales pendientes.
+**Estado:** recorridos funcionales validados y capturas actualizadas.
 
 ## Cliente
 
@@ -18,7 +18,10 @@
 2. Mantener proveedores, destinos, categorías y servicios.
 3. Validar información propuesta por proveedores.
 4. Configurar políticas comerciales.
-5. Consultar reportes y auditoría.
+5. Abrir **Dashboard**, ajustar periodo, destino, estado y horizonte, y aplicar filtros.
+6. Interpretar KPI, alertas, proyección y tabla de riesgo; los resultados son académicos y no ejecutan decisiones automáticas.
+7. Abrir **Asistente IA**, seleccionar una pregunta sugerida o escribir una consulta sobre reservas, ingresos, usuarios, reclamos, destinos, servicios o riesgos.
+8. Consultar auditoría.
 
 ## Proveedor
 

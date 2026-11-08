@@ -11,8 +11,10 @@ import {
 } from '@nestjs/common';
 import {
   BookingDto,
+  AssistantDto,
   CancellationDto,
   CatalogQueryDto,
+  DashboardQueryDto,
   ComplaintDto,
   ComplaintUpdateDto,
   PaymentDto,
@@ -211,6 +213,27 @@ export class DomainController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   report(): Promise<Record<string, unknown>> { return this.domain.report(); }
+
+  @Get('admin/dashboard')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  dashboard(@Query() query: DashboardQueryDto): Promise<Record<string, unknown>> {
+    return this.domain.dashboard(query);
+  }
+
+  @Get('admin/cancellation-risk')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  cancellationRisk(@Query() query: DashboardQueryDto): Promise<Record<string, unknown>[]> {
+    return this.domain.cancellationRisks(query);
+  }
+
+  @Post('admin/assistant')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  assistant(@Body() dto: AssistantDto): Promise<Record<string, unknown>> {
+    return this.domain.adminAssistant(dto.message);
+  }
 
   @Get('admin/audit')
   @UseGuards(JwtAuthGuard, RolesGuard)

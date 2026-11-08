@@ -10,6 +10,7 @@ import {
   BookingDto,
   CancellationDto,
   CatalogQueryDto,
+  DashboardQueryDto,
   ComplaintDto,
   ComplaintUpdateDto,
   PaymentDto,
@@ -521,6 +522,299 @@ export class DomainService {
       usersByRole,
       topServices: popular.map((row: Row) => ({ name: row.name, bookings: Number(row.reservations ?? 0) })),
       detail: { bookings, payments, cancellations, complaints, users },
+    };
+  }
+
+  async dashboard(query: DashboardQueryDto): Promise<Record<string, unknown>> {
+    const today = new Date();
+    const defaultFrom = new Date(today);
+    defaultFrom.setDate(defaultFrom.getDate() - 29);
+    const dateFrom = query.dateFrom ?? defaultFrom.toISOString().slice(0, 10);
+    const dateTo = query.dateTo ?? today.toISOString().slice(0, 10);
+    if (dateFrom > dateTo) throw new BadRequestException('La fecha inicial no puede ser posterior a la fecha final');
+
+    const conditions = ['DATE(b.booked_at) BETWEEN ? AND ?'];
+    const values: unknown[] = [dateFrom, dateTo];
+    if (query.status) { conditions.push('b.status = ?'); values.push(query.status); }
+    if (query.destinationId) {
+      conditions.push(`EXISTS (
+        SELECT 1 FROM booking_items bx
+        JOIN tourist_services sx ON sx.id = bx.service_id
+        WHERE bx.booking_id = b.id AND sx.destination_id = ?
+      )`);
+      values.push(query.destinationId);
+    }
+    const where = conditions.join(' AND ');
+
+    const [bookingRows, dailyRows, statusRows, destinationRows, topRows, revenueRows, cancellationRows, complaintRows, userRows, serviceRows] = await Promise.all([
+      this.db.query(
+        `SELECT b.id, b.code, b.status, b.total_amount AS totalAmount, b.booked_at AS bookedAt
+         FROM bookings b WHERE ${where} ORDER BY b.booked_at DESC`, values,
+      ),
+      this.db.query(
+        `SELECT DATE_FORMAT(DATE(b.booked_at), '%Y-%m-%d') AS date,
+                COUNT(*) AS bookings, SUM(b.total_amount) AS amount
+         FROM bookings b WHERE ${where}
+         GROUP BY DATE_FORMAT(DATE(b.booked_at), '%Y-%m-%d')
+         ORDER BY DATE_FORMAT(DATE(b.booked_at), '%Y-%m-%d')`, values,
+      ),
+      this.db.query(
+        `SELECT b.status, COUNT(*) AS total FROM bookings b
+         WHERE ${where} GROUP BY b.status ORDER BY b.status`, values,
+      ),
+      this.db.query(
+        `SELECT d.id, d.city, COUNT(DISTINCT b.id) AS bookings, SUM(bi.quantity) AS travelers,
+                SUM(bi.quantity * bi.unit_price) AS amount
+         FROM bookings b
+         JOIN booking_items bi ON bi.booking_id = b.id
+         JOIN tourist_services s ON s.id = bi.service_id
+         JOIN destinations d ON d.id = s.destination_id
+         WHERE ${where}
+         GROUP BY d.id, d.city ORDER BY bookings DESC, amount DESC`, values,
+      ),
+      this.db.query(
+        `SELECT s.id, s.name, d.city, SUM(bi.quantity) AS bookings
+         FROM bookings b
+         JOIN booking_items bi ON bi.booking_id = b.id
+         JOIN tourist_services s ON s.id = bi.service_id
+         JOIN destinations d ON d.id = s.destination_id
+         WHERE ${where}
+         GROUP BY s.id, s.name, d.city ORDER BY bookings DESC LIMIT 5`, values,
+      ),
+      this.db.query(
+        `SELECT COALESCE(SUM(p.amount), 0) AS total
+         FROM payments p JOIN bookings b ON b.id = p.booking_id
+         WHERE p.status IN ('approved', 'partially_refunded') AND ${where}`, values,
+      ),
+      this.db.query(
+        `SELECT COUNT(*) AS total FROM cancellations c
+         JOIN bookings b ON b.id = c.booking_id WHERE ${where}`, values,
+      ),
+      this.db.query(
+        `SELECT COUNT(*) AS total FROM complaints
+         WHERE status IN ('open', 'in_progress') AND DATE(created_at) BETWEEN ? AND ?`, [dateFrom, dateTo],
+      ),
+      this.db.query(
+        `SELECT r.code AS role, u.status, COUNT(*) AS total
+         FROM app_users u JOIN roles r ON r.id = u.role_id
+         GROUP BY r.code, u.status ORDER BY r.code`,
+      ),
+      this.db.query("SELECT COUNT(*) AS total FROM tourist_services WHERE status = 'available'"),
+    ]) as Row[][];
+
+    const revenue = Number(revenueRows[0]?.total ?? 0);
+    const totalUsers = userRows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+    const activeUsers = userRows
+      .filter((row) => String(row.status) === 'active')
+      .reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+    const usersByRole = userRows.reduce((summary: Record<string, number>, row) => {
+      const role = String(row.role);
+      summary[role] = (summary[role] ?? 0) + Number(row.total ?? 0);
+      return summary;
+    }, {});
+    const bookingStatus = statusRows.map((row) => ({ status: String(row.status), total: Number(row.total ?? 0) }));
+    const daily = dailyRows.map((row) => ({ date: String(row.date), bookings: Number(row.bookings ?? 0), amount: Number(row.amount ?? 0) }));
+    const forecast = this.buildForecast(daily, dateFrom, dateTo, query.forecastDays ?? 7, bookingRows);
+    const cancellationRisks = await this.cancellationRisks({ ...query, dateFrom: undefined, dateTo: undefined });
+    const highRisk = cancellationRisks.filter((row) => row.level === 'high').length;
+    const openComplaints = Number(complaintRows[0]?.total ?? 0);
+    const cancellationCount = Number(cancellationRows[0]?.total ?? 0);
+    const alerts: Row[] = [];
+    if (openComplaints > 0) alerts.push({ severity: openComplaints >= 5 ? 'high' : 'medium', title: `${openComplaints} reclamo(s) requieren atención`, route: '/soporte' });
+    if (highRisk > 0) alerts.push({ severity: 'high', title: `${highRisk} reserva(s) con riesgo alto de cancelación`, route: '/admin/reportes' });
+    if (cancellationCount > 0) alerts.push({ severity: 'medium', title: `${cancellationCount} solicitud(es) de cancelación en el periodo`, route: '/soporte' });
+    if (destinationRows.length) alerts.push({ severity: 'info', title: `${destinationRows[0].city} lidera la demanda del periodo`, route: '/admin/reportes' });
+
+    return {
+      generatedAt: new Date().toISOString(),
+      filters: { dateFrom, dateTo, destinationId: query.destinationId ?? null, status: query.status ?? null, forecastDays: query.forecastDays ?? 7 },
+      kpis: {
+        bookings: bookingRows.length,
+        confirmedBookings: bookingRows.filter((row) => ['confirmed', 'completed'].includes(String(row.status))).length,
+        revenueBob: revenue,
+        averageTicketBob: bookingRows.length ? Number((revenue / bookingRows.length).toFixed(2)) : 0,
+        cancellations: cancellationCount,
+        openComplaints,
+        activeServices: Number(serviceRows[0]?.total ?? 0),
+        totalUsers,
+        activeUsers,
+      },
+      bookingStatus,
+      daily,
+      destinationDemand: destinationRows.map((row) => ({ ...row, bookings: Number(row.bookings), travelers: Number(row.travelers), amount: Number(row.amount) })),
+      topServices: topRows.map((row) => ({ ...row, bookings: Number(row.bookings) })),
+      usersByRole,
+      forecast,
+      cancellationRisks: cancellationRisks.slice(0, 10),
+      alerts,
+    };
+  }
+
+  async cancellationRisks(query: DashboardQueryDto = {}): Promise<Row[]> {
+    const conditions = [query.status ? 'b.status = ?' : "b.status IN ('pending', 'confirmed')"];
+    const values: unknown[] = query.status ? [query.status] : [];
+    if (query.destinationId) {
+      conditions.push(`EXISTS (
+        SELECT 1 FROM booking_items bx JOIN tourist_services sx ON sx.id = bx.service_id
+        WHERE bx.booking_id = b.id AND sx.destination_id = ?
+      )`);
+      values.push(query.destinationId);
+    }
+    const rows = (await this.db.query(
+      `SELECT b.id, b.code, b.status, b.total_amount AS totalAmount, b.booked_at AS bookedAt,
+              CONCAT(u.first_name, ' ', u.last_name) AS customer, u.email,
+              DATEDIFF(MIN(bi.service_date), CURDATE()) AS daysUntilService,
+              (SELECT COUNT(*) FROM cancellations c2
+               JOIN bookings b2 ON b2.id = c2.booking_id
+               WHERE b2.customer_user_id = b.customer_user_id AND b2.id <> b.id) AS priorCancellations,
+              (SELECT COUNT(*) FROM complaints cp WHERE cp.customer_user_id = b.customer_user_id) AS complaints,
+              EXISTS(SELECT 1 FROM payments p WHERE p.booking_id = b.id AND p.status IN ('approved', 'partially_refunded')) AS hasPayment
+       FROM bookings b
+       JOIN app_users u ON u.id = b.customer_user_id
+       LEFT JOIN booking_items bi ON bi.booking_id = b.id
+       WHERE ${conditions.join(' AND ')}
+       GROUP BY b.id, b.code, b.status, b.total_amount, b.booked_at, u.first_name, u.last_name, u.email
+       ORDER BY b.booked_at DESC LIMIT 60`, values,
+    )) as Row[];
+
+    return rows.map((row) => {
+      const factors: string[] = [];
+      const prior = Number(row.priorCancellations ?? 0);
+      const complaints = Number(row.complaints ?? 0);
+      const amount = Number(row.totalAmount ?? 0);
+      const days = Number(row.daysUntilService ?? 0);
+      const hasPayment = Boolean(row.hasPayment);
+      let score = 10;
+      if (String(row.status) === 'pending') { score += 10; factors.push('reserva pendiente'); }
+      if (!hasPayment) { score += 15; factors.push('sin pago aprobado'); }
+      if (prior > 0) { score += Math.min(30, prior * 12); factors.push(`${prior} cancelación(es) previas`); }
+      if (complaints > 0) { score += Math.min(15, complaints * 5); factors.push(`${complaints} reclamo(s) asociado(s)`); }
+      if (amount >= 800) { score += 10; factors.push('importe elevado'); }
+      if (days >= 0 && days <= 3) { score += 15; factors.push('salida próxima'); }
+      if (days > 30) { score += 5; factors.push('reserva con mucha anticipación'); }
+      score = Math.min(100, score);
+      const level = score >= 60 ? 'high' : score >= 35 ? 'medium' : 'low';
+      return { ...row, totalAmount: amount, daysUntilService: days, score, level, factors: factors.length ? factors : ['sin señales relevantes'] };
+    }).sort((a, b) => Number(b.score) - Number(a.score));
+  }
+
+  async adminAssistant(message: string): Promise<Record<string, unknown>> {
+    const normalized = message.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const [report, risks, destinationRows] = await Promise.all([
+      this.report(),
+      this.cancellationRisks(),
+      this.db.query(
+        `SELECT d.city, COUNT(DISTINCT b.id) AS bookings
+         FROM bookings b JOIN booking_items bi ON bi.booking_id = b.id
+         JOIN tourist_services s ON s.id = bi.service_id
+         JOIN destinations d ON d.id = s.destination_id
+         GROUP BY d.id, d.city ORDER BY bookings DESC LIMIT 1`,
+      ) as Promise<Row[]>,
+    ]);
+    const suggestedQuestions = [
+      '¿Cuántas reservas están confirmadas?',
+      '¿Cuál es el servicio más reservado?',
+      '¿Cuántos reclamos están abiertos?',
+      '¿Hay reservas con riesgo alto?',
+    ];
+    let intent = 'help';
+    let answer = 'Puedo consultar reservas, ingresos, usuarios, reclamos, destinos, servicios populares y riesgo de cancelación.';
+    let data: unknown = null;
+    let actions = [{ label: 'Abrir dashboard', route: '/admin/reportes' }];
+
+    if (/riesgo|cancelacion|cancelar/.test(normalized)) {
+      intent = 'cancellation_risk';
+      const high = risks.filter((row) => row.level === 'high');
+      answer = high.length
+        ? `Hay ${high.length} reserva(s) con riesgo alto. La de mayor puntuación es ${high[0].code} con ${high[0].score}/100.`
+        : 'No hay reservas con riesgo alto en este momento.';
+      data = high.slice(0, 5);
+    } else if (/reclamo|queja|soporte/.test(normalized)) {
+      intent = 'open_complaints';
+      answer = `Actualmente existen ${Number(report.openComplaints ?? 0)} reclamo(s) abiertos o en progreso.`;
+      data = { openComplaints: report.openComplaints };
+      actions = [{ label: 'Abrir bandeja de atención', route: '/soporte' }];
+    } else if (/ingreso|importe|venta|recaud/.test(normalized)) {
+      intent = 'revenue';
+      answer = `El importe aprobado o parcialmente reembolsado registrado es Bs ${Number(report.totalRevenueBob ?? 0).toFixed(2)}.`;
+      data = { totalRevenueBob: report.totalRevenueBob };
+    } else if (/usuario|cliente|proveedor|rol/.test(normalized)) {
+      intent = 'users';
+      answer = `Hay ${report.totalUsers} usuarios registrados y ${report.activeUsers} activos. La distribución por rol está disponible en el dashboard.`;
+      data = { totalUsers: report.totalUsers, activeUsers: report.activeUsers, usersByRole: report.usersByRole };
+      actions = [{ label: 'Administrar usuarios', route: '/admin/usuarios' }];
+    } else if (/servicio|popular|mas reservado|más reservado/.test(normalized)) {
+      intent = 'top_service';
+      const top = (report.topServices as Row[] | undefined)?.[0];
+      answer = top ? `${top.name} es el servicio más reservado, con ${top.bookings} reserva(s).` : 'Todavía no hay reservas suficientes para identificar un servicio líder.';
+      data = top ?? null;
+    } else if (/destino|ciudad|lugar/.test(normalized)) {
+      intent = 'top_destination';
+      const top = destinationRows[0];
+      answer = top ? `${top.city} es el destino con mayor demanda, con ${top.bookings} reserva(s).` : 'Todavía no hay datos suficientes por destino.';
+      data = top ?? null;
+    } else if (/reserva|confirmada|pendiente/.test(normalized)) {
+      intent = 'bookings';
+      answer = `Hay ${report.bookings} reservas registradas; ${report.confirmedBookings} están confirmadas o completadas.`;
+      data = { bookings: report.bookings, confirmedBookings: report.confirmedBookings };
+    }
+
+    return { intent, answer, data, actions, suggestedQuestions, confidence: intent === 'help' ? 0.55 : 0.92, mode: 'asistente determinístico con datos del sistema' };
+  }
+
+  private buildForecast(
+    dailyRows: Array<{ date: string; bookings: number; amount: number }>,
+    dateFrom: string,
+    dateTo: string,
+    forecastDays: number,
+    bookingRows: Row[],
+  ): Record<string, unknown> {
+    const byDate = new Map(dailyRows.map((row) => [row.date, row]));
+    const end = new Date(`${dateTo}T00:00:00Z`);
+    const requestedStart = new Date(`${dateFrom}T00:00:00Z`);
+    const earliest = new Date(end);
+    earliest.setUTCDate(earliest.getUTCDate() - 59);
+    const start = requestedStart > earliest ? requestedStart : earliest;
+    const history: Array<{ date: string; bookings: number; amount: number }> = [];
+    for (const cursor = new Date(start); cursor <= end; cursor.setUTCDate(cursor.getUTCDate() + 1)) {
+      const date = cursor.toISOString().slice(0, 10);
+      history.push(byDate.get(date) ?? { date, bookings: 0, amount: 0 });
+    }
+    const values = history.map((point) => point.bookings);
+    const n = Math.max(1, values.length);
+    const sumX = values.reduce((sum, _value, index) => sum + index, 0);
+    const sumY = values.reduce((sum, value) => sum + value, 0);
+    const sumXY = values.reduce((sum, value, index) => sum + index * value, 0);
+    const sumXX = values.reduce((sum, _value, index) => sum + index * index, 0);
+    const denominator = n * sumXX - sumX * sumX;
+    const slope = denominator ? (n * sumXY - sumX * sumY) / denominator : 0;
+    const intercept = (sumY - slope * sumX) / n;
+    const mean = sumY / n;
+    const residual = values.reduce((sum, value, index) => sum + (value - (intercept + slope * index)) ** 2, 0);
+    const totalVariance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0);
+    const rSquared = totalVariance ? Math.max(0, 1 - residual / totalVariance) : 0.5;
+    const averageTicket = bookingRows.length
+      ? bookingRows.reduce((sum, row) => sum + Number(row.totalAmount ?? 0), 0) / bookingRows.length
+      : 0;
+    const points = Array.from({ length: forecastDays }, (_value, offset) => {
+      const date = new Date(end);
+      date.setUTCDate(date.getUTCDate() + offset + 1);
+      const bookings = Number(Math.max(0, intercept + slope * (history.length + offset)).toFixed(1));
+      return { date: date.toISOString().slice(0, 10), bookings, revenueBob: Number((bookings * averageTicket).toFixed(2)) };
+    });
+    const projectedBookings = Number(points.reduce((sum, point) => sum + point.bookings, 0).toFixed(1));
+    const nonZeroDays = values.filter((value) => value > 0).length;
+    const confidence = Math.round(Math.max(35, Math.min(88, 42 + rSquared * 30 + Math.min(12, nonZeroDays))));
+    return {
+      model: 'regresión lineal simple',
+      history,
+      points,
+      projectedBookings,
+      projectedRevenueBob: Number(points.reduce((sum, point) => sum + point.revenueBob, 0).toFixed(2)),
+      trend: slope > 0.03 ? 'creciente' : slope < -0.03 ? 'decreciente' : 'estable',
+      slope: Number(slope.toFixed(4)),
+      confidence,
+      disclaimer: 'Estimación académica basada en datos sintéticos; no constituye una predicción comercial.',
     };
   }
 

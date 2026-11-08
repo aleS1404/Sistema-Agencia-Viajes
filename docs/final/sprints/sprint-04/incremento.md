@@ -13,3 +13,5 @@
 | Diagramas | VALIDADO | diagramas/modelos-preliminares.md |
 | Limitaciones | DOCUMENTADO | Políticas y operaciones son demostrativas; faltan capturas. |
 
+**Mejora final incorporada:** indicador preventivo de cancelación basado en reserva pendiente, ausencia de pago, antecedentes sintéticos, reclamos, importe y proximidad de salida. Devuelve puntaje, nivel y factores; no toma decisiones automáticas. Su presentación se integra en Sprint 5.
+

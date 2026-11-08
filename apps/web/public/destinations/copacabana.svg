@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" role="img" aria-labelledby="title desc">
+  <title id="title">Copacabana</title><desc id="desc">Ilustración del lago Titicaca y las montañas de Copacabana.</desc>
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#80c8ed"/><stop offset="1" stop-color="#f8d8a2"/></linearGradient><linearGradient id="lake" x2="0" y2="1"><stop stop-color="#3e9fc2"/><stop offset="1" stop-color="#175c83"/></linearGradient></defs>
+  <rect width="800" height="420" fill="url(#sky)"/><circle cx="625" cy="94" r="50" fill="#ffe499"/><path d="M0 235 150 122l128 106 123-91 135 99 128-112 136 111v55H0z" fill="#536f66"/><path d="m91 190 59-68 50 42-51-15zM606 176l58-52 49 40-52-15z" fill="#eef6f3"/><path d="M0 238h800v182H0z" fill="url(#lake)"/><path d="M0 296q130-28 255 0t270 0 275 0" fill="none" stroke="#b8e5e9" stroke-width="8" opacity=".55"/><path d="M0 345q140-25 280 0t280 0 240 0" fill="none" stroke="#8fd1db" stroke-width="6" opacity=".45"/><path d="m360 290 82-20 78 20-78 18z" fill="#f2ce78"/><path d="m442 270 5-66 50 66z" fill="#fff4dc"/><path d="M447 207h8v63h-8z" fill="#5f4d35"/>
+</svg>

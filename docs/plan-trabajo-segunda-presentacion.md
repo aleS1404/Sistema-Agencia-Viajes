@@ -143,7 +143,7 @@ No se marcará un caso como terminado sin captura o resultado verificable, prueb
 
 **Backlog seleccionado:** PB-03, PB-04, PB-13, PB-16 y PB-17.
 
-**Desarrollo:** CRUD de proveedores, destinos, categorías y servicios; flujo de propuesta del proveedor; búsqueda y comparación; recomendación por intereses, presupuesto y duración; explicación del resultado.
+**Desarrollo:** CRUD de proveedores, destinos, categorías y servicios; flujo de propuesta del proveedor; búsqueda y comparación; recomendación por intereses, presupuesto y duración; explicación del resultado; ilustraciones SVG locales, accesibles y con carga diferida para La Paz, Copacabana y Coroico.
 
 **Diagramas:**
 
@@ -191,7 +191,7 @@ No se marcará un caso como terminado sin captura o resultado verificable, prueb
 
 **Backlog seleccionado:** PB-08, PB-09, PB-11, PB-19 y PB-20.
 
-**Desarrollo:** solicitud y resolución de cancelación; solicitud y aprobación/rechazo de reembolso; regla mínima fija y versionada de postventa; registro, asignación y resolución de reclamos; historial de estados. La administración configurable de políticas corresponde a PB-14 en Sprint 5.
+**Desarrollo:** solicitud y resolución de cancelación; solicitud y aprobación/rechazo de reembolso; regla mínima fija y versionada de postventa; registro, asignación y resolución de reclamos; historial de estados; indicador heurístico explicable de riesgo con puntaje, nivel y factores. La administración configurable de políticas corresponde a PB-14 en Sprint 5 y la visualización consolidada del riesgo a PB-15.
 
 **Diagramas:**
 
@@ -215,7 +215,7 @@ No se marcará un caso como terminado sin captura o resultado verificable, prueb
 
 **Backlog seleccionado:** PB-14 y PB-15; cierre transversal de PB-01 a PB-21.
 
-**Desarrollo:** políticas comerciales configurables; dashboard; consultas agregadas; endurecimiento de seguridad; corrección de defectos; datos completos de demostración; respaldo/restauración; manual e informe final.
+**Desarrollo:** políticas comerciales configurables; dashboard filtrable; consultas agregadas; predicción académica mediante regresión lineal; integración del riesgo de cancelación; asistente administrativo por intenciones; endurecimiento de seguridad; corrección de defectos; datos completos de demostración; respaldo/restauración; manual e informe final. Estas funciones amplían PB-15 y PB-17 sin añadir casos al Product Backlog de 21 elementos.
 
 **Diagramas:**
 

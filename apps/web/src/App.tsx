@@ -1,5 +1,8 @@
 import {
+  Activity,
+  AlertTriangle,
   BarChart3,
+  Bot,
   BookOpen,
   CalendarDays,
   CheckCircle2,
@@ -18,10 +21,12 @@ import {
   PackageSearch,
   Plus,
   Search,
+  Send,
   Settings2,
   ShieldCheck,
   Sparkles,
   Store,
+  TrendingUp,
   UserRound,
   UsersRound,
   X,
@@ -29,7 +34,7 @@ import {
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { API_URL, ApiError, api } from './api';
-import type { Booking, Complaint, Policy, Profile, Provider, ReportSummary, Role, Service, User } from './types';
+import type { AdminDashboard, AssistantResponse, Booking, Complaint, Policy, Profile, Provider, Role, Service, User } from './types';
 
 type Notice = { type: 'success' | 'error'; message: string } | null;
 
@@ -172,7 +177,8 @@ const navItems: NavItem[] = [
   { to: '/admin/usuarios', label: 'Usuarios', icon: <UsersRound size={19} />, roles: ['ADMIN'] },
   { to: '/admin/catalogo', label: 'Catálogo', icon: <ClipboardList size={19} />, roles: ['ADMIN'] },
   { to: '/admin/politicas', label: 'Políticas', icon: <Settings2 size={19} />, roles: ['ADMIN'] },
-  { to: '/admin/reportes', label: 'Reportes', icon: <BarChart3 size={19} />, roles: ['ADMIN'] },
+  { to: '/admin/reportes', label: 'Dashboard', icon: <BarChart3 size={19} />, roles: ['ADMIN'] },
+  { to: '/admin/asistente', label: 'Asistente IA', icon: <Bot size={19} />, roles: ['ADMIN'] },
 ];
 
 const roleLabel: Record<Role, string> = {
@@ -277,9 +283,14 @@ function HomePage({ user }: { user: User }) {
 }
 
 function ServiceCard({ service, selected, onCompare, onReserve }: { service: Service; selected?: boolean; onCompare?: () => void; onReserve?: () => void }) {
+  const city = service.destination?.city || 'Bolivia';
+  const imageKey = city.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]+/g, '-').replace(/(^-|-$)/g, '');
   return (
     <article className={`service-card ${selected ? 'selected' : ''}`}>
-      <div className="service-image"><span>{service.destination?.city || 'Bolivia'}</span><Compass /></div>
+      <div className="service-image">
+        <img src={`/destinations/${['la-paz', 'copacabana', 'coroico'].includes(imageKey) ? imageKey : 'default'}.svg`} alt={`Paisaje ilustrado de ${city}`} loading="lazy" />
+        <span>{city}</span><Compass />
+      </div>
       <div className="service-body">
         <div className="service-meta"><span>{service.category?.name || 'Servicio'}</span><StatusPill value={service.status} /></div>
         <h3>{service.name}</h3><p>{service.description}</p>
@@ -413,17 +424,53 @@ function PoliciesPage() {
   return <><PageHeader eyebrow="Administración" title="Políticas comerciales" description="Configura reglas demostrativas de cancelación y reembolso." /><NoticeBar notice={notice} onClose={() => setNotice(null)} /><div className="split-layout"><section className="panel"><h2>Nueva política</h2><form className="form-stack" onSubmit={submit}><label>Nombre<input name="name" required /></label><label>Descripción<textarea name="description" rows={3} required /></label><div className="form-grid two"><label>Anticipación mínima (horas)<input name="cancellationHours" type="number" min="0" required /></label><label>Reembolso máximo (%)<input name="refundPercentage" type="number" min="0" max="100" required /></label></div><button className="btn btn-primary">Guardar política</button></form></section><section className="panel"><h2>Políticas registradas</h2>{remote.loading ? <LoadingState /> : remote.data?.length ? <div className="mini-list">{remote.data.map((p) => <div key={p.id}><span><strong>{p.name}</strong><small>{p.cancellationHours} h · {p.refundPercentage}%</small></span><StatusPill value={p.active ? 'active' : 'disabled'} /></div>)}</div> : <p className="muted">No hay políticas configuradas.</p>}</section></div></>;
 }
 
+function ForecastChart({ dashboard }: { dashboard: AdminDashboard }) {
+  const history = dashboard.forecast.history.slice(-14);
+  const future = dashboard.forecast.points;
+  const values = [...history.map((point) => point.bookings), ...future.map((point) => point.bookings)];
+  const maximum = Math.max(1, ...values);
+  const width = 760; const height = 230; const padding = 28;
+  const point = (value: number, index: number) => {
+    const x = padding + (index * (width - padding * 2)) / Math.max(1, values.length - 1);
+    const y = height - padding - (value / maximum) * (height - padding * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  };
+  const historyPoints = history.map((item, index) => point(item.bookings, index)).join(' ');
+  const forecastValues = history.length ? [history[history.length - 1].bookings, ...future.map((item) => item.bookings)] : future.map((item) => item.bookings);
+  const forecastPoints = forecastValues.map((value, index) => point(value, Math.max(0, history.length - 1) + index)).join(' ');
+  return <div className="forecast-chart"><svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Histórico y proyección de reservas"><line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="chart-axis" /><polyline points={historyPoints} className="chart-history" /><polyline points={forecastPoints} className="chart-forecast" /></svg><div className="chart-legend"><span><i className="legend-history" /> Histórico</span><span><i className="legend-forecast" /> Proyección</span></div></div>;
+}
+
 function ReportsPage() {
-  const remote = useRemote<ReportSummary>(api.reportSummary, []);
-  const metrics = remote.data ? [
-    ['Reservas', remote.data.bookings, <CalendarDays />], ['Confirmadas', remote.data.confirmedBookings, <CheckCircle2 />], ['Importe registrado', money(remote.data.totalRevenueBob), <CircleDollarSign />], ['Cancelaciones', remote.data.cancellations, <X />], ['Reclamos abiertos', remote.data.openComplaints, <MessageSquareWarning />], ['Servicios activos', remote.data.activeServices, <Store />],
-    ['Usuarios', remote.data.totalUsers, <UsersRound />], ['Usuarios activos', remote.data.activeUsers, <UserRound />],
+  const today = new Date(); const monthAgo = new Date(today); monthAgo.setDate(monthAgo.getDate() - 29);
+  const initial = { dateFrom: monthAgo.toISOString().slice(0, 10), dateTo: today.toISOString().slice(0, 10), destinationId: '', status: '', forecastDays: '7' };
+  const [draft, setDraft] = useState(initial); const [filters, setFilters] = useState(initial);
+  const destinations = useRemote(api.destinations, []);
+  const query = useMemo(() => { const params = new URLSearchParams(); Object.entries(filters).forEach(([key, value]) => { if (value) params.set(key, value); }); return `?${params}`; }, [filters]);
+  const remote = useRemote<AdminDashboard>(() => api.dashboard(query), [query]);
+  const data = remote.data;
+  const metrics: Array<[string, string | number, ReactNode]> = data ? [
+    ['Reservas', data.kpis.bookings, <CalendarDays />], ['Confirmadas', data.kpis.confirmedBookings, <CheckCircle2 />], ['Ingresos aprobados', money(data.kpis.revenueBob), <CircleDollarSign />], ['Ticket promedio', money(data.kpis.averageTicketBob), <TrendingUp />], ['Cancelaciones', data.kpis.cancellations, <X />], ['Reclamos abiertos', data.kpis.openComplaints, <MessageSquareWarning />], ['Servicios activos', data.kpis.activeServices, <Store />], ['Usuarios activos', data.kpis.activeUsers, <UsersRound />],
   ] : [];
-  const max = Math.max(1, ...(remote.data?.topServices?.map((s) => s.bookings) || [1]));
-  const roleEntries = Object.entries(remote.data?.usersByRole || {});
-  const maxRole = Math.max(1, ...roleEntries.map(([, total]) => total));
-  const roleNames: Record<string, string> = { ADMIN: 'Administradores', CUSTOMER: 'Clientes', SUPPORT: 'Atención', PROVIDER: 'Proveedores' };
-  return <><PageHeader eyebrow="Analítica descriptiva" title="Reportes del prototipo" description="Indicadores calculados sobre datos sintéticos; no representan ingresos reales." />{remote.loading ? <LoadingState /> : remote.error ? <ErrorState error={remote.error} retry={remote.refresh} /> : remote.data && <><section className="metric-grid">{metrics.map(([label, value, icon]) => <article className="metric-card" key={String(label)}><span>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></article>)}</section><div className="split-layout section-space"><section className="panel"><h2>Servicios más reservados</h2>{remote.data.topServices?.length ? <div className="bar-list">{remote.data.topServices.map((s) => <div key={s.name}><div><strong>{s.name}</strong><span>{s.bookings}</span></div><span className="bar-track"><span style={{ width: `${(s.bookings / max) * 100}%` }} /></span></div>)}</div> : <p className="muted">Aún no hay reservas suficientes para este reporte.</p>}</section><section className="panel"><h2>Usuarios por rol</h2>{roleEntries.length ? <div className="bar-list">{roleEntries.map(([role, total]) => <div key={role}><div><strong>{roleNames[role] || role}</strong><span>{total}</span></div><span className="bar-track"><span style={{ width: `${(total / maxRole) * 100}%` }} /></span></div>)}</div> : <p className="muted">No hay usuarios registrados.</p>}</section></div></>}</>;
+  const topMax = Math.max(1, ...(data?.topServices.map((item) => item.bookings) || [1]));
+  const statusMax = Math.max(1, ...(data?.bookingStatus.map((item) => item.total) || [1]));
+  return <><PageHeader eyebrow="Inteligencia administrativa" title="Dashboard predictivo" description="Indicadores, alertas y estimaciones explicables calculadas con los datos sintéticos del prototipo." />
+    <form className="dashboard-filters panel" onSubmit={(event) => { event.preventDefault(); setFilters(draft); }}><label>Desde<input type="date" value={draft.dateFrom} onChange={(event) => setDraft({ ...draft, dateFrom: event.target.value })} /></label><label>Hasta<input type="date" value={draft.dateTo} onChange={(event) => setDraft({ ...draft, dateTo: event.target.value })} /></label><label>Destino<select value={draft.destinationId} onChange={(event) => setDraft({ ...draft, destinationId: event.target.value })}><option value="">Todos</option>{destinations.data?.map((item) => <option value={item.id} key={item.id}>{item.city}</option>)}</select></label><label>Estado<select value={draft.status} onChange={(event) => setDraft({ ...draft, status: event.target.value })}><option value="">Todos</option><option value="pending">Pendiente</option><option value="confirmed">Confirmada</option><option value="completed">Completada</option><option value="cancelled">Cancelada</option></select></label><label>Proyección<select value={draft.forecastDays} onChange={(event) => setDraft({ ...draft, forecastDays: event.target.value })}><option value="7">7 días</option><option value="14">14 días</option><option value="30">30 días</option></select></label><button className="btn btn-primary">Aplicar filtros</button></form>
+    {remote.loading ? <LoadingState label="Calculando indicadores…" /> : remote.error ? <ErrorState error={remote.error} retry={remote.refresh} /> : data && <><section className="metric-grid dashboard-metrics">{metrics.map(([label, value, icon]) => <article className="metric-card" key={label}><span>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></article>)}</section>
+      <div className="dashboard-main section-space"><section className="panel chart-panel"><div className="panel-title"><div><span className="eyebrow">Modelo: {data.forecast.model}</span><h2>Demanda proyectada</h2></div><span className="confidence">{data.forecast.confidence}% confianza orientativa</span></div><ForecastChart dashboard={data} /><div className="forecast-summary"><div><small>Tendencia</small><strong>{data.forecast.trend}</strong></div><div><small>Reservas proyectadas</small><strong>{data.forecast.projectedBookings}</strong></div><div><small>Ingreso proyectado</small><strong>{money(data.forecast.projectedRevenueBob)}</strong></div></div><p className="model-note">{data.forecast.disclaimer}</p></section><aside className="panel"><h2>Alertas operativas</h2><div className="alert-list">{data.alerts.length ? data.alerts.map((alert, index) => <div className={`alert-item ${alert.severity}`} key={`${alert.title}-${index}`}><AlertTriangle size={18} /><span>{alert.title}</span></div>) : <p className="muted">No existen alertas para el periodo.</p>}</div></aside></div>
+      <div className="split-layout section-space"><section className="panel"><h2>Servicios más reservados</h2><div className="bar-list">{data.topServices.map((item) => <div key={item.id}><div><strong>{item.name}</strong><span>{item.bookings}</span></div><span className="bar-track"><span style={{ width: `${(item.bookings / topMax) * 100}%` }} /></span></div>)}</div></section><section className="panel"><h2>Reservas por estado</h2><div className="bar-list">{data.bookingStatus.map((item) => <div key={item.status}><div><strong>{item.status.replaceAll('_', ' ')}</strong><span>{item.total}</span></div><span className="bar-track"><span style={{ width: `${(item.total / statusMax) * 100}%` }} /></span></div>)}</div></section></div>
+      <section className="panel section-space"><div className="panel-title"><div><span className="eyebrow">Indicador preventivo</span><h2>Riesgo de cancelación</h2></div><small>Reglas ponderadas y factores visibles</small></div><div className="table-wrap"><table><thead><tr><th>Reserva</th><th>Cliente</th><th>Importe</th><th>Puntaje</th><th>Nivel</th><th>Factores</th></tr></thead><tbody>{data.cancellationRisks.map((risk) => <tr key={risk.id}><td><strong>{risk.code}</strong><small>{risk.status}</small></td><td>{risk.customer}</td><td>{money(risk.totalAmount)}</td><td><strong>{risk.score}/100</strong></td><td><span className={`risk-pill risk-${risk.level}`}>{risk.level}</span></td><td>{risk.factors.join(' · ')}</td></tr>)}</tbody></table></div>{!data.cancellationRisks.length && <p className="muted">No hay reservas activas para evaluar.</p>}</section>
+    </>}</>;
+}
+
+type ChatMessage = { role: 'user' | 'assistant'; text: string; response?: AssistantResponse };
+
+function AdminAssistantPage() {
+  const navigate = useNavigate(); const [message, setMessage] = useState(''); const [loading, setLoading] = useState(false); const [notice, setNotice] = useState<Notice>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([{ role: 'assistant', text: 'Hola. Puedo consultar reservas, ingresos, usuarios, reclamos, destinos y riesgos con datos actuales del sistema.' }]);
+  const prompts = ['¿Cuántas reservas están confirmadas?', '¿Cuál es el servicio más reservado?', '¿Cuántos reclamos están abiertos?', '¿Hay reservas con riesgo alto?'];
+  async function ask(text: string) { const clean = text.trim(); if (!clean || loading) return; setMessages((current) => [...current, { role: 'user', text: clean }]); setMessage(''); setLoading(true); setNotice(null); try { const response = await api.assistant(clean); setMessages((current) => [...current, { role: 'assistant', text: response.answer, response }]); } catch (error) { setNotice({ type: 'error', message: errorMessage(error) }); } finally { setLoading(false); } }
+  return <><PageHeader eyebrow="Consulta administrativa" title="Asistente de datos" description="Interpreta preguntas frecuentes mediante intenciones y responde con información viva de la base de datos." /><NoticeBar notice={notice} onClose={() => setNotice(null)} /><div className="assistant-layout"><section className="panel chat-panel"><div className="chat-messages" aria-live="polite">{messages.map((item, index) => <div className={`chat-bubble ${item.role}`} key={index}><span>{item.role === 'assistant' ? <Bot size={18} /> : <UserRound size={18} />}</span><div><p>{item.text}</p>{item.response?.actions.map((action) => <button className="btn btn-ghost" key={action.route} onClick={() => navigate(action.route)}>{action.label}<ChevronRight size={16} /></button>)}</div></div>)}{loading && <div className="chat-bubble assistant"><span><Bot size={18} /></span><div><p>Consultando los datos…</p></div></div>}</div><form className="assistant-form" onSubmit={(event) => { event.preventDefault(); void ask(message); }}><input value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Ej.: ¿Cuántos reclamos están abiertos?" maxLength={300} /><button className="btn btn-primary" disabled={loading || !message.trim()} aria-label="Enviar consulta"><Send size={18} /> Enviar</button></form></section><aside className="panel assistant-help"><Activity /><h2>Consultas sugeridas</h2><p className="muted">Las respuestas son explicables y no usan servicios externos.</p><div className="quick-prompts">{prompts.map((prompt) => <button className="btn btn-ghost" onClick={() => void ask(prompt)} key={prompt}>{prompt}</button>)}</div><div className="model-note"><strong>Alcance:</strong> asistente académico basado en reglas de intención. No reemplaza una decisión humana.</div></aside></div></>;
 }
 
 function NotAllowed() { return <ErrorState error="Tu rol no tiene permiso para acceder a esta sección." />; }
@@ -457,6 +504,7 @@ export default function App() {
     <Route path="/admin/catalogo" element={<ProtectedRole user={user} roles={['ADMIN']}><CatalogAdminPage /></ProtectedRole>} />
     <Route path="/admin/politicas" element={<ProtectedRole user={user} roles={['ADMIN']}><PoliciesPage /></ProtectedRole>} />
     <Route path="/admin/reportes" element={<ProtectedRole user={user} roles={['ADMIN']}><ReportsPage /></ProtectedRole>} />
+    <Route path="/admin/asistente" element={<ProtectedRole user={user} roles={['ADMIN']}><AdminAssistantPage /></ProtectedRole>} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></AppShell>;
 }

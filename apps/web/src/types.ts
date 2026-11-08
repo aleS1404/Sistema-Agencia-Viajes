@@ -109,6 +109,63 @@ export interface ReportSummary {
   topServices?: Array<{ name: string; bookings: number }>;
 }
 
+export interface CancellationRisk {
+  id: number;
+  code: string;
+  customer: string;
+  email: string;
+  status: Booking['status'];
+  totalAmount: number;
+  daysUntilService: number;
+  score: number;
+  level: 'low' | 'medium' | 'high';
+  factors: string[];
+}
+
+export interface AdminDashboard {
+  generatedAt: string;
+  filters: { dateFrom: string; dateTo: string; destinationId?: number | null; status?: string | null; forecastDays: number };
+  kpis: {
+    bookings: number;
+    confirmedBookings: number;
+    revenueBob: number;
+    averageTicketBob: number;
+    cancellations: number;
+    openComplaints: number;
+    activeServices: number;
+    totalUsers: number;
+    activeUsers: number;
+  };
+  bookingStatus: Array<{ status: string; total: number }>;
+  daily: Array<{ date: string; bookings: number; amount: number }>;
+  destinationDemand: Array<{ id: number; city: string; bookings: number; travelers: number; amount: number }>;
+  topServices: Array<{ id: number; name: string; city: string; bookings: number }>;
+  usersByRole: Partial<Record<Role, number>>;
+  forecast: {
+    model: string;
+    history: Array<{ date: string; bookings: number; amount: number }>;
+    points: Array<{ date: string; bookings: number; revenueBob: number }>;
+    projectedBookings: number;
+    projectedRevenueBob: number;
+    trend: string;
+    slope: number;
+    confidence: number;
+    disclaimer: string;
+  };
+  cancellationRisks: CancellationRisk[];
+  alerts: Array<{ severity: 'high' | 'medium' | 'info'; title: string; route: string }>;
+}
+
+export interface AssistantResponse {
+  intent: string;
+  answer: string;
+  data?: unknown;
+  actions: Array<{ label: string; route: string }>;
+  suggestedQuestions: string[];
+  confidence: number;
+  mode: string;
+}
+
 export interface ApiList<T> {
   data: T[];
   total?: number;

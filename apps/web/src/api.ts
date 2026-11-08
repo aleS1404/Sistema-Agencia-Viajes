@@ -1,4 +1,4 @@
-import type { ApiList, Booking, Complaint, Policy, Profile, Provider, ReportSummary, Service, User } from './types';
+import type { AdminDashboard, ApiList, AssistantResponse, Booking, CancellationRisk, Complaint, Policy, Profile, Provider, ReportSummary, Service, User } from './types';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
 
@@ -140,6 +140,9 @@ export const api = {
   createPolicy: (body: Partial<Policy>) => request<Policy>('/admin/policies', { method: 'POST', body }),
   updatePolicy: (id: number, body: Partial<Policy>) => request<Policy>(`/policies/${id}`, { method: 'PATCH', body }),
   reportSummary: () => request<ReportSummary>('/admin/reports'),
+  dashboard: (query = '') => request<AdminDashboard>(`/admin/dashboard${query}`),
+  cancellationRisks: (query = '') => request<CancellationRisk[]>(`/admin/cancellation-risk${query}`),
+  assistant: (message: string) => request<AssistantResponse>('/admin/assistant', { method: 'POST', body: { message } }),
   supportCancellations: () => request<Array<Record<string, unknown>>>('/support/cancellations'),
   resolveCancellation: (id: number, status: 'approved' | 'rejected') =>
     request(`/support/cancellations/${id}`, { method: 'PATCH', body: { status } }),

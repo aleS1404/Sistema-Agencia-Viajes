@@ -12,8 +12,9 @@ Esta carpeta es la fuente documental de la segunda presentación. Mantiene separ
 - `evidencias/`: capturas verificadas del acceso, usuarios, reportes, catálogo y recomendaciones.
 - `presentacion/`: defensa final interactiva en HTML y copia PDF de 16 diapositivas.
 - `diagramas/`: arquitectura general interactiva y exportable.
+- `ia/`: documentación y arquitecturas interactivas del dashboard predictivo, asistente y riesgo de cancelación.
 
-Los 21 casos quedaron trazados como `PROBADO` el 8 de noviembre de 2026 mediante endpoints, pruebas y recorrido integrado. El informe actualizado incorpora 35 diagramas de sprint y cinco capturas de la interfaz ejecutada.
+Los 21 casos quedaron trazados como `PROBADO` el 8 de noviembre de 2026 mediante endpoints, pruebas y recorrido integrado. El informe actualizado incorpora 35 diagramas de sprint y seis capturas de la interfaz ejecutada.
 
 ## Generación del Word
 

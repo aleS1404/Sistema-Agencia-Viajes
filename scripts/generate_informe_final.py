@@ -332,10 +332,11 @@ def build() -> Path:
     intro.paragraph_format.first_line_indent = Cm(1.27)
     evidence = [
         ("pantalla-acceso.png", "Figura C.1. Pantalla de acceso del sistema.", Inches(6.2)),
-        ("panel-administrador.png", "Figura C.2. Panel principal del administrador.", Inches(6.2)),
-        ("usuarios-administrador.png", "Figura C.3. Gestión administrativa de usuarios.", Inches(5.0)),
-        ("catalogo-cliente.png", "Figura C.4. Catálogo disponible para el cliente.", Inches(5.0)),
-        ("recomendaciones-cliente.png", "Figura C.5. Recomendaciones explicables del cliente.", Inches(5.0)),
+        ("panel-administrador.png", "Figura C.2. Dashboard predictivo e indicador de riesgo.", Inches(6.2)),
+        ("asistente-administrador.png", "Figura C.3. Asistente administrativo por intenciones.", Inches(6.2)),
+        ("usuarios-administrador.png", "Figura C.4. Gestión administrativa de usuarios.", Inches(5.0)),
+        ("catalogo-cliente.png", "Figura C.5. Catálogo con imágenes locales de destinos.", Inches(5.0)),
+        ("recomendaciones-cliente.png", "Figura C.6. Recomendaciones explicables del cliente.", Inches(5.0)),
     ]
     for file_name, caption_text, width in evidence:
         image_path = INTERFACE_EVIDENCE / file_name

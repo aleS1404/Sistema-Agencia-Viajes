@@ -2,6 +2,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsDateString,
   IsEmail,
   IsIn,
   IsInt,
@@ -11,6 +12,7 @@ import {
   IsString,
   Length,
   MaxLength,
+  Max,
   Min,
   MinLength,
   ValidateNested,
@@ -135,4 +137,16 @@ export class CatalogQueryDto {
   @IsOptional() @Type(() => Number) @IsInt() maxDays?: number;
   @IsOptional() @Transform(({ value }: { value: string }) => value?.split(',').map(Number))
   @IsArray() @IsInt({ each: true }) ids?: number[];
+}
+
+export class DashboardQueryDto {
+  @IsOptional() @IsDateString() dateFrom?: string;
+  @IsOptional() @IsDateString() dateTo?: string;
+  @IsOptional() @Type(() => Number) @IsInt() destinationId?: number;
+  @IsOptional() @IsIn(['pending', 'confirmed', 'cancelled', 'partially_refunded', 'refunded', 'completed']) status?: string;
+  @IsOptional() @Type(() => Number) @IsInt() @Min(1) @Max(30) forecastDays?: number;
+}
+
+export class AssistantDto {
+  @IsString() @Length(2, 300) message!: string;
 }

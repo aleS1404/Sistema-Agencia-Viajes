@@ -44,6 +44,12 @@ try {
     'tbody tr',
   );
   await loginAndCapture(
+    'admin@andesgo.demo',
+    '/admin/asistente',
+    'docs/final/evidencias/asistente-administrador.png',
+    '.chat-panel',
+  );
+  await loginAndCapture(
     'cliente@andesgo.demo',
     '/catalogo',
     'docs/final/evidencias/catalogo-cliente.png',
