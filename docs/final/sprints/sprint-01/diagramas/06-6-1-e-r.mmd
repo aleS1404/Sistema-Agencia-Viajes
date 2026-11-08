@@ -1,0 +1,6 @@
+erDiagram
+  ROLES ||--o{ APP_USERS : asigna
+  APP_USERS ||--o| CUSTOMER_PROFILES : posee
+  CUSTOMER_PROFILES ||--o{ CUSTOMER_INTERESTS : declara
+  INTERESTS ||--o{ CUSTOMER_INTERESTS : clasifica
+  APP_USERS ||--o{ AUDIT_LOGS : ejecuta

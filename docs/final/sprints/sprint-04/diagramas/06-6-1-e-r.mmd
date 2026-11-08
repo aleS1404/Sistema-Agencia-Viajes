@@ -1,0 +1,7 @@
+erDiagram
+  BOOKINGS ||--o{ CANCELLATIONS : origina
+  APP_USERS ||--o{ CANCELLATIONS : solicita
+  CANCELLATIONS ||--o{ REFUNDS : permite
+  PAYMENTS ||--o{ REFUNDS : respalda
+  APP_USERS ||--o{ COMPLAINTS : registra
+  BOOKINGS ||--o{ COMPLAINTS : relaciona

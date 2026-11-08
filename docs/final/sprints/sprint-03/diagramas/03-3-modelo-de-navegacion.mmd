@@ -1,0 +1,7 @@
+flowchart LR
+  DetalleServicio --> ResumenReserva
+  ResumenReserva --> Confirmacion
+  Confirmacion --> Pago
+  Pago --> Comprobante
+  Comprobante --> Estado
+  Estado --> Itinerario

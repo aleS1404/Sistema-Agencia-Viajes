@@ -1,0 +1,8 @@
+flowchart LR
+  Cliente --> Registro[Registrarse e iniciar sesión]
+  Cliente --> Perfil[Gestionar perfil y preferencias]
+  Admin[Administrador] --> Usuarios[Gestionar usuarios]
+  Sistema --> Acceso[Proteger información y validar accesos]
+  Registro --> Acceso
+  Perfil --> Acceso
+  Usuarios --> Acceso

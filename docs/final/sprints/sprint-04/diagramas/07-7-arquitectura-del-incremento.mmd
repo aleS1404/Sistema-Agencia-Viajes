@@ -1,0 +1,9 @@
+flowchart LR
+  React --> SupportAPI
+  SupportAPI --> CancellationService
+  SupportAPI --> ComplaintService
+  CancellationService --> RefundService
+  RefundService --> PolicyRule
+  ComplaintService --> MySQL[(MySQL)]
+  RefundService --> MySQL
+  SupportAPI --> Audit

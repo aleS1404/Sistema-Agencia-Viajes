@@ -1,0 +1,7 @@
+flowchart LR
+  Cliente --> Reserva[Gestionar reservas]
+  Cliente --> Itinerario[Consultar itinerario]
+  Cliente --> Pago[Realizar pago]
+  Cliente --> Estado[Consultar estado de reserva y pagos]
+  Pasarela --> Verificar[Registrar y verificar transacciones]
+  Pago --> Verificar

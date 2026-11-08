@@ -1,0 +1,33 @@
+# Expediente de entrega final
+
+Esta carpeta es la fuente documental de la segunda presentación. Mantiene separados los planes, la evidencia y los resultados verificados para evitar declarar trabajo no comprobado.
+
+## Estado documental
+
+- `informe-final.md`: fuente maestra narrativa.
+- `trazabilidad/matriz-casos-pruebas.md`: relación entre los 21 casos, sprint, código, datos, pruebas y evidencia.
+- `sprints/`: Planning, backlog, Review, Retrospective, incremento, pruebas y siete modelos de cada sprint.
+- `manuales/`: instalación, usuario y demostración.
+- `decisiones/`: decisiones de arquitectura y alcance.
+- `evidencias/`: capturas verificadas del acceso, catálogo y panel administrativo.
+- `presentacion/`: defensa final interactiva en HTML.
+- `diagramas/`: arquitectura general interactiva y exportable.
+
+Los 21 casos quedaron trazados como `PROBADO` el 8 de noviembre de 2026 mediante endpoints, pruebas y recorrido integrado. El informe incorpora 35 diagramas de sprint y tres capturas de la interfaz ejecutada.
+
+## Generación del Word
+
+```powershell
+python scripts/generate_informe_final.py
+```
+
+El resultado se crea como `Informe_Final_Sistema_Agencia_Viajes.docx`. El archivo histórico `Marco_Aplicativo_Capitulo_III.docx` no se modifica.
+
+## Verificación reproducible
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify_product.ps1
+```
+
+El script comprueba los recorridos principales y el control de acceso de los cuatro roles contra la API levantada en Docker.
+

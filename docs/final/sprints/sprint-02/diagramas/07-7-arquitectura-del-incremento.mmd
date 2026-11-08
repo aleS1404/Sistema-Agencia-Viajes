@@ -1,0 +1,8 @@
+flowchart LR
+  React --> CatalogAPI
+  React --> RecommendationAPI
+  CatalogAPI --> CatalogService
+  RecommendationAPI --> RecommendationService
+  RecommendationService --> CatalogService
+  CatalogService --> TypeORM
+  TypeORM --> MySQL[(MySQL)]

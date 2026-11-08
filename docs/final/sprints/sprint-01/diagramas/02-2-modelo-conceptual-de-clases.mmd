@@ -1,0 +1,10 @@
+classDiagram
+  class Role { +id +code +name }
+  class User { +id +email +passwordHash +status }
+  class CustomerProfile { +maxBudgetBob +availableDays +notes }
+  class Interest { +id +code +name }
+  class AuditLog { +action +entityType +createdAt }
+  Role "1" --> "*" User
+  User "1" --> "0..1" CustomerProfile
+  CustomerProfile "*" --> "*" Interest
+  User "1" --> "*" AuditLog

@@ -2,9 +2,9 @@ SET NAMES utf8mb4;
 
 INSERT INTO roles (code, name) VALUES
     ('ADMIN', 'Administrador'),
-    ('AGENT', 'Agente de viajes'),
     ('CUSTOMER', 'Cliente/Viajero'),
-    ('SUPPORT', 'Personal de atención al cliente')
+    ('SUPPORT', 'Personal de atención al cliente'),
+    ('PROVIDER', 'Proveedor turístico')
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 INSERT INTO interests (code, name) VALUES

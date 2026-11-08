@@ -1,0 +1,7 @@
+flowchart TD
+  A[Enviar credenciales] --> B{Formato válido}
+  B -- No --> E[Mostrar error]
+  B -- Sí --> C{Credenciales correctas}
+  C -- No --> E
+  C -- Sí --> D[Emitir JWT y registrar auditoría]
+  D --> F[Autorizar por rol y propiedad]

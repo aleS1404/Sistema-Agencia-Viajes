@@ -6,4 +6,11 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 ~$*
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+playwright-report/
+test-results/
 

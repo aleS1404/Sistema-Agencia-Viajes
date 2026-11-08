@@ -2,7 +2,9 @@ SELECT 'roles' AS entity, COUNT(*) AS records FROM roles
 UNION ALL SELECT 'providers', COUNT(*) FROM providers
 UNION ALL SELECT 'destinations', COUNT(*) FROM destinations
 UNION ALL SELECT 'services', COUNT(*) FROM tourist_services
-UNION ALL SELECT 'interests', COUNT(*) FROM interests;
+UNION ALL SELECT 'interests', COUNT(*) FROM interests
+UNION ALL SELECT 'commercial_policies', COUNT(*) FROM commercial_policies
+UNION ALL SELECT 'provider_users', COUNT(*) FROM provider_users;
 
 SELECT
     s.code,

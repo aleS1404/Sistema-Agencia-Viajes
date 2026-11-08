@@ -1,0 +1,5 @@
+erDiagram
+  APP_USERS ||--o{ BOOKINGS : cliente
+  BOOKINGS ||--|{ BOOKING_ITEMS : contiene
+  TOURIST_SERVICES ||--o{ BOOKING_ITEMS : reservado
+  BOOKINGS ||--o{ PAYMENTS : recibe

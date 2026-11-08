@@ -1,0 +1,8 @@
+flowchart LR
+  EstadoReserva --> SolicitarCancelacion
+  SolicitarCancelacion --> Seguimiento
+  Seguimiento --> SolicitarReembolso
+  EstadoReserva --> NuevoReclamo
+  NuevoReclamo --> MisReclamos
+  PanelSoporte --> Bandeja
+  Bandeja --> Resolucion

@@ -1,0 +1,9 @@
+flowchart LR
+  Cliente --> Cancelar[Cancelar reserva]
+  Cliente --> Reembolso[Solicitar reembolso]
+  Cliente --> Reclamo[Registrar reclamo]
+  Soporte --> Gestion[Gestionar cancelaciones y reembolsos]
+  Soporte --> Atender[Atender reclamos]
+  Cancelar --> Gestion
+  Reembolso --> Gestion
+  Reclamo --> Atender

@@ -1,0 +1,9 @@
+flowchart TD
+  A[Recibir solicitud] --> B{Rol y propiedad válidos}
+  B -- No --> X[Rechazar acceso]
+  B -- Sí --> C{Cumple política fija}
+  C -- No --> Y[Rechazar solicitud]
+  C -- Sí --> D[Aprobar cancelación]
+  D --> E{Existe pago aprobado}
+  E -- Sí --> F[Crear reembolso limitado]
+  E -- No --> G[Cerrar sin reembolso]

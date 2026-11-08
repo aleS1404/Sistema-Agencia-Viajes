@@ -1,0 +1,7 @@
+flowchart TD
+  A[Recibir filtros y perfil] --> B[Aplicar restricciones]
+  B --> C[Calcular coincidencia de intereses]
+  C --> D[Ordenar resultados]
+  D --> E{Hay resultados}
+  E -- Sí --> F[Mostrar hasta cinco con razones]
+  E -- No --> G[Mostrar alternativas y estado vacío]

@@ -1,0 +1,12 @@
+classDiagram
+  class CommercialPolicy { +code +name +daysBefore +refundPercent +active }
+  class ReportQuery { +dateFrom +dateTo +status }
+  class Booking { +status +totalAmount }
+  class Payment { +status +amount }
+  class Refund { +status +amount }
+  class Complaint { +status }
+  CommercialPolicy --> Booking
+  ReportQuery --> Booking
+  ReportQuery --> Payment
+  ReportQuery --> Refund
+  ReportQuery --> Complaint

@@ -1,0 +1,10 @@
+classDiagram
+  class Cancellation { +reason +status +requestedAt +resolvedAt }
+  class Refund { +referenceCode +amount +status }
+  class Complaint { +code +subject +status +resolution }
+  class Booking { +status +totalAmount }
+  class Payment { +status +amount }
+  Cancellation "*" --> "1" Booking
+  Refund "*" --> "1" Cancellation
+  Refund "*" --> "1" Payment
+  Complaint "*" --> "0..1" Booking

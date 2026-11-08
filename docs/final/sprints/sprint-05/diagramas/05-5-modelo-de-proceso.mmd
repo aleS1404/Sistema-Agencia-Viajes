@@ -1,0 +1,7 @@
+flowchart TD
+  A[Elegir rango y filtros] --> B[Validar rol administrador]
+  B --> C{Autorizado}
+  C -- No --> X[Denegar]
+  C -- Sí --> D[Agregar reservas y pagos]
+  D --> E[Agregar postventa]
+  E --> F[Mostrar indicadores y fecha de corte]

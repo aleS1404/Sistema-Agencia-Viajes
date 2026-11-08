@@ -1,0 +1,9 @@
+flowchart TD
+  A[Seleccionar servicio y fecha] --> B[Validar capacidad]
+  B --> C{Disponible}
+  C -- No --> X[Rechazar]
+  C -- Sí --> D[Crear reserva pendiente]
+  D --> E[Registrar pago simulado]
+  E --> F{Aprobado}
+  F -- Sí --> G[Confirmar reserva]
+  F -- No --> H[Mantener pendiente]

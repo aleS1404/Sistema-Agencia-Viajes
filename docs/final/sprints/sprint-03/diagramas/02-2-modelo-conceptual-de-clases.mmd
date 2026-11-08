@@ -1,0 +1,8 @@
+classDiagram
+  class Booking { +code +status +totalAmount +bookedAt }
+  class BookingItem { +quantity +unitPrice +serviceDate }
+  class TouristService { +name +priceBob +capacity }
+  class Payment { +referenceCode +method +status +amount }
+  Booking "1" --> "1..*" BookingItem
+  BookingItem "*" --> "1" TouristService
+  Booking "1" --> "*" Payment

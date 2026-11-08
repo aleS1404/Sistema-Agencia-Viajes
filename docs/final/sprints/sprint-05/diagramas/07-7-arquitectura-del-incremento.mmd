@@ -1,0 +1,11 @@
+flowchart LR
+  Browser[React] --> API[NestJS]
+  API --> Auth[JWT y RBAC]
+  API --> Modules[Servicios de dominio]
+  Modules --> ORM[TypeORM]
+  ORM --> DB[(MySQL)]
+  Adminer --> DB
+  Compose[Docker Compose] --> Browser
+  Compose --> API
+  Compose --> DB
+  API --> Audit[Auditoría]

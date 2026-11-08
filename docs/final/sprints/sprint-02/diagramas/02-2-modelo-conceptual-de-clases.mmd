@@ -1,0 +1,12 @@
+classDiagram
+  class Provider { +id +tradeName +status }
+  class Destination { +city +department +country }
+  class Category { +code +name }
+  class TouristService { +code +name +priceBob +capacity +status }
+  class Interest { +code +name }
+  class Recommendation { +score +reasons }
+  Provider "1" --> "*" TouristService
+  Destination "1" --> "*" TouristService
+  Category "1" --> "*" TouristService
+  TouristService "*" --> "*" Interest
+  TouristService --> Recommendation

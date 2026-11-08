@@ -1,0 +1,8 @@
+flowchart LR
+  React --> BookingAPI
+  BookingAPI --> BookingService
+  BookingService --> PaymentService
+  BookingService --> Tx[Transacción TypeORM]
+  PaymentService --> Tx
+  Tx --> MySQL[(MySQL)]
+  BookingService --> Audit

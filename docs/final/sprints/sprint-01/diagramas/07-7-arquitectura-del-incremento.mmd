@@ -1,0 +1,7 @@
+flowchart LR
+  Browser[React] --> API[NestJS API]
+  API --> Auth[Auth y RBAC]
+  Auth --> Domain[Servicios de dominio]
+  Domain --> ORM[TypeORM]
+  ORM --> DB[(MySQL)]
+  API --> Audit[Auditoría]
