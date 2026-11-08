@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cronograma de actividades por sprints</title>
+  <style>
+    :root { --forest:#123d31; --green:#1f6a50; --mint:#e6f3ed; --sand:#e8b957; --ink:#17362d; --muted:#64766f; --line:#cbdad3; --paper:#f6f8f6; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-width: 1800px; min-height: 1120px; background: var(--paper); color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; }
+    body { padding: 54px 64px 46px; }
+    .sheet { width: 1672px; margin: 0 auto; border: 1px solid #bfd0c8; border-radius: 28px; padding: 38px 40px 30px; background: #fff; box-shadow: 0 24px 60px rgba(18,61,49,.12); }
+    header { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; margin-bottom: 28px; }
+    .eyebrow { display: block; margin-bottom: 9px; color: #966b16; font-size: 15px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; color: var(--forest); font-size: 39px; line-height: 1.05; letter-spacing: -.03em; }
+    .subtitle { max-width: 550px; margin: 0; color: var(--muted); font-size: 18px; line-height: 1.45; text-align: right; }
+    table { width: 100%; overflow: hidden; border-collapse: separate; border-spacing: 0; border: 1px solid var(--line); border-radius: 18px; table-layout: fixed; }
+    col.activity { width: 410px; }
+    col.period { width: 168px; }
+    thead th { height: 92px; padding: 13px 9px; border-right: 1px solid rgba(255,255,255,.16); color: #fff; background: var(--forest); font-size: 17px; line-height: 1.25; text-align: center; }
+    thead th:first-child { padding-left: 22px; text-align: left; }
+    thead th:last-child { border-right: 0; }
+    tbody th, tbody td { height: 66px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); background: #fff; }
+    tbody th { position: relative; padding: 10px 16px 10px 22px; color: #29483e; font-size: 17px; line-height: 1.25; text-align: left; }
+    tbody th::before { content: ""; position: absolute; inset: 11px auto 11px 0; width: 6px; border-radius: 0 7px 7px 0; background: var(--row-color, var(--green)); }
+    tbody td { padding: 7px; text-align: center; }
+    tbody tr:nth-child(even) td { background: #f8fbf9; }
+    tbody td:last-child, tbody th:last-child { border-right: 0; }
+    .prep { --row-color: #82948d; }
+    .s1 { --row-color: #238165; }
+    .s2 { --row-color: #318f76; }
+    .s3 { --row-color: #d29b34; }
+    .s4 { --row-color: #d67845; }
+    .s5 { --row-color: #7858a6; }
+    .quality { --row-color: #3b73a5; }
+    .closing { --row-color: #b74a58; }
+    .x { display: inline-grid; place-items: center; width: 38px; height: 38px; border: 2px solid var(--green); border-radius: 50%; color: #fff; background: var(--green); font-size: 20px; font-weight: 900; box-shadow: 0 5px 12px rgba(31,106,80,.2); }
+    .x.secondary { border-color: #d29b34; background: #d29b34; box-shadow: 0 5px 12px rgba(210,155,52,.2); }
+    .hours th, .hours td { height: 58px; color: var(--forest); background: var(--mint) !important; font-size: 18px; font-weight: 850; }
+    .hours th::before { background: var(--forest); }
+    footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 23px; color: var(--muted); font-size: 15px; }
+    .legend { display: flex; align-items: center; gap: 17px; }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .mini-x { display: inline-grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; color: #fff; background: var(--green); font-size: 12px; font-weight: 900; }
+    .mini-x.secondary { background: #d29b34; }
+    .note { text-align: right; }
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <header>
+      <div><span class="eyebrow">Planificación Scrum · AndesGo</span><h1>Cronograma de actividades por sprints</h1></div>
+      <p class="subtitle">Periodo planificado: 14 de octubre al 9 de noviembre de 2026<br />Desarrollo, integración, documentación y entrega final</p>
+    </header>
+    <table aria-label="Cronograma de actividades por sprints">
+      <colgroup><col class="activity" /><col class="period" span="7" /></colgroup>
+      <thead><tr><th>Actividad</th><th>14 al 18<br />oct.</th><th>19 al 23<br />oct.</th><th>24 al 28<br />oct.</th><th>29 oct. al<br />2 nov.</th><th>3 al 5<br />nov.</th><th>6 al 8<br />nov.</th><th>9<br />nov.</th></tr></thead>
+      <tbody>
+        <tr class="prep"><th>Planificación, requisitos, Product Backlog y arquitectura</th><td><span class="x">X</span></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="s1"><th>Sprint 1 — Identidad, perfiles, roles y seguridad</th><td><span class="x">X</span></td><td><span class="x secondary">X</span></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="s2"><th>Sprint 2 — Catálogo, fotografías y recomendación</th><td></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td><td></td><td></td><td></td><td></td></tr>
+        <tr class="s3"><th>Sprint 3 — Reservas, itinerario y pagos simulados</th><td></td><td></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td><td></td><td></td><td></td></tr>
+        <tr class="s4"><th>Sprint 4 — Cancelaciones, reembolsos, reclamos y riesgo</th><td></td><td></td><td></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td><td></td><td></td></tr>
+        <tr class="s5"><th>Sprint 5 — Políticas, dashboard, predicción y asistente</th><td></td><td></td><td></td><td></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td><td></td></tr>
+        <tr class="quality"><th>Modelos, diagramas y documentación de cada sprint</th><td><span class="x">X</span></td><td><span class="x">X</span></td><td><span class="x">X</span></td><td><span class="x">X</span></td><td><span class="x">X</span></td><td><span class="x">X</span></td><td></td></tr>
+        <tr class="quality"><th>Pruebas funcionales, IA, seguridad e integración</th><td></td><td></td><td></td><td><span class="x">X</span></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td><td></td></tr>
+        <tr class="closing"><th>Correcciones, informe final, evidencias y manuales</th><td></td><td></td><td></td><td></td><td><span class="x">X</span></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td></tr>
+        <tr class="closing"><th>Instalación, ensayo, ZIP y entrega final</th><td></td><td></td><td></td><td></td><td></td><td><span class="x">X</span></td><td><span class="x secondary">X</span></td></tr>
+        <tr class="hours"><th>Horas conjuntas por periodo</th><td>24</td><td>30</td><td>30</td><td>30</td><td>24</td><td>30</td><td>12</td></tr>
+      </tbody>
+    </table>
+    <footer>
+      <div class="legend"><span><i class="mini-x">X</i> Desarrollo principal</span><span><i class="mini-x secondary">X</i> Cierre, validación o integración</span></div>
+      <div class="note">Total planificado: 180 horas conjuntas · Fuente: elaboración propia</div>
+    </footer>
+  </main>
+</body>
+</html>
