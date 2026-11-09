@@ -1,0 +1,30 @@
+ANDESGO - SISTEMA PARA COMPARTIR
+================================
+
+Esta carpeta permite instalar y ejecutar el proyecto en Windows SIN Docker.
+
+REQUISITOS PREVIOS
+1. Node.js 22 o superior: https://nodejs.org/
+2. MySQL Server 8.0 u 8.4: https://dev.mysql.com/downloads/installer/
+3. Conexión a internet solamente durante la instalación de dependencias.
+
+ORDEN DE EJECUCIÓN
+1. Abra GUIA_INSTALACION.html y siga los requisitos.
+2. Ejecute 1_INSTALAR_DEPENDENCIAS.bat.
+3. Ejecute 2_CONFIGURAR_MYSQL.bat.
+   Este paso recrea únicamente la base demostrativa booking_demo.
+4. Ejecute 3_INICIAR_SISTEMA.bat.
+5. Abra http://localhost:5173 si el navegador no se abre automáticamente.
+6. Para cerrar, ejecute 4_DETENER_SISTEMA.bat.
+
+CREDENCIAL PRINCIPAL
+Administrador: admin@andesgo.demo
+Contraseña: Demo1234!
+
+DOCUMENTACIÓN
+- GUIA_INSTALACION.html: requisitos, solución de problemas y configuración.
+- GUIA_USO.html: recorridos por cada rol y funciones del sistema.
+- documentacion/: informe final, cronograma y créditos de fotografías.
+
+IMPORTANTE
+El sistema utiliza datos sintéticos y pagos simulados. Es un prototipo académico.
